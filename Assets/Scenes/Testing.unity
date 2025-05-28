@@ -3664,8 +3664,8 @@ MonoBehaviour:
   dontDestroyOnLoad: 1
   contextSize: 8192
   batchSize: 512
-  model: 
-  chatTemplate: llama3 chat
+  model: Qwen3-14B-Q4_K_M.gguf
+  chatTemplate: qwen3
   lora: 
   loraWeights: 
   flashAttention: 0
@@ -3675,9 +3675,9 @@ MonoBehaviour:
   SSLKey: 
   SSLKeyPath: 
   minContextLength: 0
-  maxContextLength: 131072
+  maxContextLength: 40960
   embeddingsOnly: 0
-  embeddingLength: 4096
+  embeddingLength: 5120
 --- !u!4 &1027529912
 Transform:
   m_ObjectHideFlags: 0

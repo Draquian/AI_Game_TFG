@@ -40,7 +40,7 @@ public class LLMComunication : MonoBehaviour
 
             for (int i = 0; i < allTexts.Length; i++)
             {
-                System.Threading.Tasks.Task<string> task = llmCharacter.Chat("Translate to " + targetLanguage + " the text after the ':', translate only the text without adding more text and following a videogame context:" + allTexts[i].text, SetNewText, null, true);
+                System.Threading.Tasks.Task<string> task = llmCharacter.Chat("Translate to " + targetLanguage + " the text:" + allTexts[i].text, SetNewText, null, true);
                 
                 yield return new WaitUntil(() => task.IsCompleted);
 
