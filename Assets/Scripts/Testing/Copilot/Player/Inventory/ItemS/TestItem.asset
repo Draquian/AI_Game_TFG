@@ -12,7 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1a3f580a1d74604d8e067898543e6ee, type: 3}
   m_Name: TestItem
   m_EditorClassIdentifier: 
-  itemName: Test 1
   icon: {fileID: -1563021374, guid: f8e323dac3586734a9764e70f65482b2, type: 3}
+  worldModelPrefab: {fileID: 0}
   itemType: 3
-  description: This is a test Item
+  stats:
+    rid: 581056236167364628
+  references:
+    version: 2
+    RefIds:
+    - rid: 581056236167364628
+      type: {class: OtherStats, ns: , asm: Assembly-CSharp}
+      data:
+        itemName: 
+        description: 
+        isConsumable: 0

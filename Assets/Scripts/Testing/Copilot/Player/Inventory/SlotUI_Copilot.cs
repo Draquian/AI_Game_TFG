@@ -4,63 +4,70 @@ using UnityEngine.UI;
 
 public class SlotUI_Copilot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IDropHandler
 {
-    public int slotIndex; // Index corresponding to the inventory slot.
-    public InventoryUI_Copilot inventoryUI; // Set by InventoryUI when instantiating the slot.
+    public int slotIndex;                      // This slot's index in the inventory.
+    public InventoryUI_Copilot inventoryUI;            // Reference to the Inventory UI manager.
 
-    private Transform originalParent;
-    private Canvas canvas;
-    private CanvasGroup canvasGroup;
-    private RectTransform rectTrans;
+    private Transform originalParent;          // The original parent container of this UI element.
+    private Vector2 originalAnchoredPos;       // Stored anchored position to snap back if needed.
+    private Canvas canvas;                     // The canvas containing this UI, used for proper drag layering.
+    private CanvasGroup canvasGroup;           // Used to control blocking of Raycasts during dragging.
+    private RectTransform rectTrans;           // The RectTransform component.
+    private bool droppedOnValidSlot = false;   // Flag: was a valid slot drop detected?
 
     private void Awake()
     {
-        canvas = GetComponentInParent<Canvas>();  // Ensure you have a Canvas in the scene.
-        rectTrans = GetComponent<RectTransform>();  
+        // Locate the canvas and RectTransform references.
+        canvas = GetComponentInParent<Canvas>();
+        rectTrans = GetComponent<RectTransform>();
+
+        // Ensure there is a CanvasGroup component.
         canvasGroup = GetComponent<CanvasGroup>();
         if (canvasGroup == null)
-        {
             canvasGroup = gameObject.AddComponent<CanvasGroup>();
-        }
     }
 
-    /// <summary>
-    /// On begin drag, store the current parent and change the parent to the Canvas for clear visibility.
-    /// </summary>
     public void OnBeginDrag(PointerEventData eventData)
     {
+        // Reset our flag for a valid drop.
+        droppedOnValidSlot = false;
+        // Store the original parent (the slot container) and anchored position.
         originalParent = transform.parent;
+        originalAnchoredPos = rectTrans.anchoredPosition;
+        // Bring the dragged item to the top-level canvas (for correct rendering order).
         transform.SetParent(canvas.transform, false);
-        canvasGroup.blocksRaycasts = false;  // Allow underlying objects to receive drop events.
+        // Allow underlying UI elements to receive raycast events.
+        canvasGroup.blocksRaycasts = false;
     }
 
-    /// <summary>
-    /// Move the slot with the pointer.
-    /// </summary>
     public void OnDrag(PointerEventData eventData)
     {
+        // Follow the pointer as the item is dragged.
         rectTrans.position = eventData.position;
     }
 
-    /// <summary>
-    /// When the drag ends, revert back to its original parent.
-    /// </summary>
     public void OnEndDrag(PointerEventData eventData)
     {
-        transform.SetParent(originalParent, false);
+        // If the item wasn't dropped on a valid slot, snap it back.
+        if (!droppedOnValidSlot)
+        {
+            transform.SetParent(originalParent, false);
+            rectTrans.anchoredPosition = originalAnchoredPos;
+        }
+        // Re-enable raycast blocking.
         canvasGroup.blocksRaycasts = true;
     }
 
-    /// <summary>
-    /// When another draggable slot is dropped on this slot, swap their items.
-    /// </summary>
     public void OnDrop(PointerEventData eventData)
     {
-        // Get the slot that is being dragged.
+        // Check if what was dropped is another SlotUI.
         SlotUI_Copilot draggedSlotUI = eventData.pointerDrag.GetComponent<SlotUI_Copilot>();
         if (draggedSlotUI != null && draggedSlotUI != this)
         {
+            // Inform the InventoryUI to swap items based on the underlying inventory data.
             inventoryUI.SwapSlots(draggedSlotUI.slotIndex, this.slotIndex);
-            // Refresh the UI to reflect the swap.
+            // Mark that a valid drop has occurred.
+            droppedOnValidSlot = true;
+            // Refresh the UI to reassign slot positions (this will "snap" items into place).
             inventoryUI.RefreshUI();
         }
     }

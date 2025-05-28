@@ -16,6 +16,9 @@ public class Inventory_Copilot : MonoBehaviour
 
     public event Action OnInventoryChanged;
 
+    private PlayerStats_Copilot playerStats;
+
+
     public ItemSO_Copilot testItem1;
     public ItemSO_Copilot testItem2;
 
@@ -53,37 +56,33 @@ public class Inventory_Copilot : MonoBehaviour
     /// </summary>
     public bool AddItem(ItemSO_Copilot itemToAdd)
     {
-        Debug.Log("Add item: " + itemToAdd.itemName);
         for (int i = 0; i < slots.Count; i++)
         {
-            Debug.Log("Test 1");
-
             if (slots[i].item == null)
             {
-                Debug.Log("Test 2");
-
                 slots[i].item = itemToAdd;
 
                 // Check if the added item in slot 0 is a class item.
-                if (i == 0 && itemToAdd.itemType == ItemSO_Copilot.ItemType.ClassItem)
+                /*if (i == 0 && itemToAdd.itemType == ItemSO_Copilot.ItemType.Weapon)
                 {
-                    Debug.Log("Test 3");
+                    // Ensure PlayerStats is attached.
+                    playerStats = gameObject.GetComponent<PlayerStats_Copilot>();
+                    if (playerStats == null)
+                    {
+                        playerStats = gameObject.AddComponent<PlayerStats_Copilot>();
+                    }
 
-                    // PlayerController.Instance.AssignClass(itemToAdd); // Your class assignment logic here.
+                    playerStats.ChangeClass(itemToAdd.classType); ; // Your class assignment logic here.
                     Debug.Log("Player class updated based on item: " + itemToAdd.itemName);
-                }
+                }*/
 
                 // Trigger the inventory changed event
                 OnInventoryChanged?.Invoke();
 
                 return true;
-                Debug.Log("Test 4");
-
             }
-            Debug.Log("Test5");
-
         }
-        Debug.Log("Inventory is full. Could not add: " + itemToAdd.itemName);
+        Debug.Log("Inventory is full. Could not add: " + itemToAdd.stats.itemName);
         return false;
     }
 
@@ -98,12 +97,14 @@ public class Inventory_Copilot : MonoBehaviour
             Debug.LogWarning("Invalid inventory slot index: " + index);
             return;
         }
+
         if (index == 0)
         {
-            // PlayerController.Instance.ResetClass();
+            // Example: PlayerController.Instance.ResetClass();
             Debug.Log("Player class removed from slot 0.");
         }
         slots[index].item = null;
+        OnInventoryChanged?.Invoke();
     }
 
     /// <summary>
@@ -122,7 +123,7 @@ public class Inventory_Copilot : MonoBehaviour
         slots[indexB].item = temp;
 
         // Update class slot if the first slot is involved.
-        if (indexA == 0 || indexB == 0)
+        /*if (indexA == 0 || indexB == 0)
         {
             ItemSO_Copilot potentialClassItem = slots[0].item;
             if (potentialClassItem != null && potentialClassItem.itemType == ItemSO_Copilot.ItemType.ClassItem)
@@ -135,7 +136,8 @@ public class Inventory_Copilot : MonoBehaviour
                 // PlayerController.Instance.ResetClass();
                 Debug.Log("Player class reset after swap.");
             }
-        }
+        }*/
+        OnInventoryChanged?.Invoke();
     }
 
     /// <summary>
@@ -147,6 +149,7 @@ public class Inventory_Copilot : MonoBehaviour
         {
             slots[i].item = null;
         }
+        OnInventoryChanged?.Invoke();
         Debug.Log("Inventory cleared.");
     }
 }

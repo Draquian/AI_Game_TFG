@@ -5,6 +5,7 @@ public class PlayerController_Copilot : MonoBehaviour
     private CharacterController characterController;
     private PlayerStats_Copilot playerStats;
     private Camera mainCamera;
+    public InventoryUI_Copilot inventoryUI; // Set by InventoryUI when instantiating the slot.
 
     // Movement variables.
     private float initialY; // Store the starting y position.
@@ -67,6 +68,7 @@ public class PlayerController_Copilot : MonoBehaviour
         HandleAttacks();
         HandleBoost();
         HandleInteraction();
+        HandleInventory();
     }
 
     void HandleMovement()
@@ -197,6 +199,31 @@ public class PlayerController_Copilot : MonoBehaviour
                     // Call the interact method on the object.
                     interactable.Interact(gameObject);
                 }
+            }
+        }
+    }
+
+    void HandleInventory()
+    {
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            if (!inventoryUI.inventoryPanel.gameObject.activeInHierarchy)
+            {
+                inventoryUI.inventoryPanel.gameObject.SetActive(true);
+                lockCameraRotation = true;
+
+                // Show and unlock the cursor when paused.
+                Cursor.visible = true;
+                Cursor.lockState = CursorLockMode.None;
+            }
+            else
+            {
+                inventoryUI.inventoryPanel.gameObject.SetActive(false);
+                lockCameraRotation = false;
+
+                // Hide and lock the cursor when the game is resumed.
+                Cursor.visible = false;
+                Cursor.lockState = CursorLockMode.Locked;
             }
         }
     }
