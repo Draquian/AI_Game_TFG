@@ -207,9 +207,9 @@ public class PlayerController_Copilot : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Tab))
         {
-            if (!inventoryUI.inventoryPanel.gameObject.activeInHierarchy)
+            if (!inventoryUI.slotParent.gameObject.activeInHierarchy)
             {
-                inventoryUI.inventoryPanel.gameObject.SetActive(true);
+                inventoryUI.slotParent.gameObject.SetActive(true);
                 lockCameraRotation = true;
 
                 // Show and unlock the cursor when paused.
@@ -218,7 +218,7 @@ public class PlayerController_Copilot : MonoBehaviour
             }
             else
             {
-                inventoryUI.inventoryPanel.gameObject.SetActive(false);
+                inventoryUI.slotParent.gameObject.SetActive(false);
                 lockCameraRotation = false;
 
                 // Hide and lock the cursor when the game is resumed.

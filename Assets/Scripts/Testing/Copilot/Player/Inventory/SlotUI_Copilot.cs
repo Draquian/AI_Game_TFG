@@ -2,73 +2,167 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class SlotUI_Copilot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IDropHandler
+public class SlotUI_Copilot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IDropHandler, IPointerClickHandler
 {
-    public int slotIndex;                      // This slot's index in the inventory.
-    public InventoryUI_Copilot inventoryUI;            // Reference to the Inventory UI manager.
+    [Tooltip("Slot index within the inventory.")]
+    public int slotIndex;
 
-    private Transform originalParent;          // The original parent container of this UI element.
-    private Vector2 originalAnchoredPos;       // Stored anchored position to snap back if needed.
-    private Canvas canvas;                     // The canvas containing this UI, used for proper drag layering.
-    private CanvasGroup canvasGroup;           // Used to control blocking of Raycasts during dragging.
-    private RectTransform rectTrans;           // The RectTransform component.
-    private bool droppedOnValidSlot = false;   // Flag: was a valid slot drop detected?
+    [Tooltip("Reference to the Inventory Controller—the player's Inventory.")]
+    public Inventory_Copilot inventoryController;
+
+    [Tooltip("The inventory that owns this slot.")]
+    public Inventory_Copilot owningInventory;
+
+    // New: Reference to the target external inventory.
+    [Tooltip("Reference to the external inventory (target for right click transfers).")]
+    public Inventory_Copilot externalInventoryTarget;
+
+    private RectTransform rectTransform;
+    private CanvasGroup canvasGroup;
+    private Transform originalParent;
+    private Vector2 originalPosition;
+    private Canvas localCanvas;
+
+    // Static reference to a dedicated drag canvas—ensure a Canvas in your scene is tagged "DragCanvas".
+    public static Canvas dragCanvas;
+
+    // Flag to indicate if the drop was successfully handled.
+    private bool dropSuccessful = false;
 
     private void Awake()
     {
-        // Locate the canvas and RectTransform references.
-        canvas = GetComponentInParent<Canvas>();
-        rectTrans = GetComponent<RectTransform>();
-
-        // Ensure there is a CanvasGroup component.
+        rectTransform = GetComponent<RectTransform>();
         canvasGroup = GetComponent<CanvasGroup>();
         if (canvasGroup == null)
             canvasGroup = gameObject.AddComponent<CanvasGroup>();
+
+        localCanvas = GetComponentInParent<Canvas>();
+
+        // Try to find a drag canvas if not already assigned.
+        if (dragCanvas == null)
+        {
+            GameObject dcObj = GameObject.FindWithTag("DragCanvas");
+            if (dcObj != null)
+                dragCanvas = dcObj.GetComponent<Canvas>();
+            else
+                dragCanvas = localCanvas; // Fallback.
+        }
+
+        // If inventoryController is not assigned, assume the player's Inventory is the controller.
+        if (inventoryController == null)
+        {
+            inventoryController = GameObject.FindObjectOfType<Inventory_Copilot>();
+            // (Optionally, you might narrow this search to the player using tags or a name.)
+            if (inventoryController == null)
+                Debug.LogError("SlotUI: Inventory Controller (Player Inventory) not found in scene.");
+        }
+
+        // If owningInventory is not set, try a simple heuristic: if this slot is under the external inventory panel, use that.
+        if (owningInventory == null && inventoryController != null)
+        {
+            // In a multi-panel setup, you might inspect the hierarchy.
+            // For this example, default to the player's inventory.
+            owningInventory = inventoryController;
+        }
     }
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        // Reset our flag for a valid drop.
-        droppedOnValidSlot = false;
-        // Store the original parent (the slot container) and anchored position.
+        dropSuccessful = false; // reset flag on each drag
         originalParent = transform.parent;
-        originalAnchoredPos = rectTrans.anchoredPosition;
-        // Bring the dragged item to the top-level canvas (for correct rendering order).
-        transform.SetParent(canvas.transform, false);
-        // Allow underlying UI elements to receive raycast events.
+        originalPosition = rectTransform.anchoredPosition;
+        // Reparent to drag canvas so this slot appears on top.
+        transform.SetParent(dragCanvas.transform, false);
         canvasGroup.blocksRaycasts = false;
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        // Follow the pointer as the item is dragged.
-        rectTrans.position = eventData.position;
+        rectTransform.position = eventData.position;
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        // If the item wasn't dropped on a valid slot, snap it back.
-        if (!droppedOnValidSlot)
+        // Only revert to original parent if no valid drop occurred.
+        if (!dropSuccessful)
         {
             transform.SetParent(originalParent, false);
-            rectTrans.anchoredPosition = originalAnchoredPos;
+            rectTransform.anchoredPosition = originalPosition;
         }
-        // Re-enable raycast blocking.
         canvasGroup.blocksRaycasts = true;
     }
 
     public void OnDrop(PointerEventData eventData)
     {
-        // Check if what was dropped is another SlotUI.
-        SlotUI_Copilot draggedSlotUI = eventData.pointerDrag.GetComponent<SlotUI_Copilot>();
-        if (draggedSlotUI != null && draggedSlotUI != this)
+        // Get the SlotUI component from the dragged object.
+        SlotUI_Copilot droppedSlot = eventData.pointerDrag?.GetComponent<SlotUI_Copilot>();
+        if (droppedSlot != null && droppedSlot != this)
         {
-            // Inform the InventoryUI to swap items based on the underlying inventory data.
-            inventoryUI.SwapSlots(draggedSlotUI.slotIndex, this.slotIndex);
-            // Mark that a valid drop has occurred.
-            droppedOnValidSlot = true;
-            // Refresh the UI to reassign slot positions (this will "snap" items into place).
-            inventoryUI.RefreshUI();
+            Inventory_Copilot sourceInventory = droppedSlot.owningInventory;
+            Inventory_Copilot destinationInventory = this.owningInventory;
+
+            if (sourceInventory == null || destinationInventory == null)
+            {
+                Debug.LogError("SlotUI.OnDrop: One or both owning inventories are null.");
+                return;
+            }
+
+            // Use the inventory controller (the player's inventory) to transfer the item.
+            inventoryController.TransferItem(sourceInventory, droppedSlot.slotIndex,
+                                             destinationInventory, this.slotIndex);
+
+
+            // Refresh both inventories' UIs.
+            sourceInventory.RefreshInventoryUI();
+            if (sourceInventory != destinationInventory)
+                destinationInventory.RefreshInventoryUI();
+
+            // Mark drop as successful so OnEndDrag won't revert the dragged object.
+            dropSuccessful = true;
+
+            // Remove the dragged UI slot so that it doesn't remain on the drag canvas.
+            Destroy(eventData.pointerDrag);
+
+            // (Optional) You can also call Destroy(gameObject) here if you want to force the target slot UI to be rebuilt.
+            // But if your UI refresh properly destroys all children in the container then this may not be necessary.
+        }
+    }
+
+    // New: Implement the IPointerClickHandler for right-click logic.
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (eventData.button == PointerEventData.InputButton.Right)
+        {
+            // Check if the external inventory is open.
+            // Retrieve the ExternalInventory component (assumes one exists in the scene).
+            ExternalInventory_Copilot extInv = GameObject.FindObjectOfType<ExternalInventory_Copilot>();
+            if (extInv == null || extInv.externalInventoryUIPanel == null ||
+                !extInv.externalInventoryUIPanel.activeSelf)
+            {
+                Debug.Log("External inventory is not open; cannot move item.");
+                return;
+            }
+
+            // Only move items from the player's inventory (we assume owningInventory == inventoryController for player slots).
+            if (owningInventory == inventoryController)
+            {
+                // Ensure the external inventory reference is assigned.
+                if (externalInventoryTarget == null)
+                {
+                    if (extInv != null)
+                        externalInventoryTarget = extInv.externalInventory;
+                }
+                // Call the function to move the item.
+                bool moved = inventoryController.MoveItemToExternalInventory(owningInventory.gameObject, slotIndex, externalInventoryTarget.gameObject);
+                if (moved)
+                {
+                    Debug.Log("Item moved to external inventory via right click.");
+                }
+                else
+                {
+                    Debug.Log("Right-click move failed (slot empty or external inventory full).");
+                }
+            }
         }
     }
 }

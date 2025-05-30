@@ -1,30 +1,25 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
-using System;
 
 public class Inventory_Copilot : MonoBehaviour
 {
-    [Header("Inventory Setup")]
-    [Tooltip("Total number of slots in the inventory.")]
+    [Header("Inventory Settings")]
     public int totalSlots = 20;
-
-    [Tooltip("Number of special (hotbar) slots. The first slot is used to assign player class.")]
     public int hotbarSlots = 4;
-
-    // List of slots that holds the item data.
     public List<InventorySlot_Copilot> slots = new List<InventorySlot_Copilot>();
 
+    // Event for UI refresh; UI scripts subscribe to this event.
     public event Action OnInventoryChanged;
-
-    private PlayerStats_Copilot playerStats;
-
 
     public ItemSO_Copilot testItem1;
     public ItemSO_Copilot testItem2;
 
+    public GameObject externalInv;
+
     private void Awake()
     {
-        // Initialize empty slots on load.
+        // Initialize the slots list.
         for (int i = 0; i < totalSlots; i++)
         {
             InventorySlot_Copilot newSlot = new InventorySlot_Copilot();
@@ -45,14 +40,13 @@ public class Inventory_Copilot : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.Z))
         {
-            RemoveItem(0);
+            MoveItemToExternalInventory(gameObject, 1, externalInv);
         }
 
     }
 
     /// <summary>
-    /// Tries to add an item (as a ScriptableObject) to the first available empty slot in the inventory.
-    /// If the item goes to slot 0 and is a class item, the player’s class is updated.
+    /// Basic method to add an item to the inventory.
     /// </summary>
     public bool AddItem(ItemSO_Copilot itemToAdd)
     {
@@ -61,95 +55,139 @@ public class Inventory_Copilot : MonoBehaviour
             if (slots[i].item == null)
             {
                 slots[i].item = itemToAdd;
-
-                // Check if the added item in slot 0 is a class item.
-                /*if (i == 0 && itemToAdd.itemType == ItemSO_Copilot.ItemType.Weapon)
-                {
-                    // Ensure PlayerStats is attached.
-                    playerStats = gameObject.GetComponent<PlayerStats_Copilot>();
-                    if (playerStats == null)
-                    {
-                        playerStats = gameObject.AddComponent<PlayerStats_Copilot>();
-                    }
-
-                    playerStats.ChangeClass(itemToAdd.classType); ; // Your class assignment logic here.
-                    Debug.Log("Player class updated based on item: " + itemToAdd.itemName);
-                }*/
-
-                // Trigger the inventory changed event
                 OnInventoryChanged?.Invoke();
-
                 return true;
             }
         }
-        Debug.Log("Inventory is full. Could not add: " + itemToAdd.stats.itemName);
+        Debug.Log("Inventory is full!");
         return false;
     }
 
     /// <summary>
-    /// Removes the item from the provided slot index.
-    /// If the removed slot is the class slot, update the player’s class accordingly.
+    /// Removes an item from a given slot.
     /// </summary>
     public void RemoveItem(int index)
     {
         if (index < 0 || index >= slots.Count)
-        {
-            Debug.LogWarning("Invalid inventory slot index: " + index);
             return;
-        }
-
-        if (index == 0)
-        {
-            // Example: PlayerController.Instance.ResetClass();
-            Debug.Log("Player class removed from slot 0.");
-        }
         slots[index].item = null;
         OnInventoryChanged?.Invoke();
     }
 
     /// <summary>
-    /// Swap items between two slot indices and update any associated logic.
+    /// Refresh method that simply invokes the change event.
+    /// (UI scripts subscribe to this method.)
     /// </summary>
-    public void SwapItems(int indexA, int indexB)
+    public void RefreshInventoryUI()
     {
-        if (indexA < 0 || indexA >= slots.Count || indexB < 0 || indexB >= slots.Count)
-        {
-            Debug.LogWarning("Invalid indices for swap: " + indexA + " & " + indexB);
-            return;
-        }
-
-        ItemSO_Copilot temp = slots[indexA].item;
-        slots[indexA].item = slots[indexB].item;
-        slots[indexB].item = temp;
-
-        // Update class slot if the first slot is involved.
-        /*if (indexA == 0 || indexB == 0)
-        {
-            ItemSO_Copilot potentialClassItem = slots[0].item;
-            if (potentialClassItem != null && potentialClassItem.itemType == ItemSO_Copilot.ItemType.ClassItem)
-            {
-                // PlayerController.Instance.AssignClass(potentialClassItem);
-                Debug.Log("Player class updated after swap.");
-            }
-            else
-            {
-                // PlayerController.Instance.ResetClass();
-                Debug.Log("Player class reset after swap.");
-            }
-        }*/
         OnInventoryChanged?.Invoke();
     }
 
     /// <summary>
-    /// Clears all items from the inventory.
+    /// TransferItem swaps items between two inventories. Since the player's Inventory
+    /// becomes the InventoryController, you call this method on the player's inventory.
     /// </summary>
-    public void ClearInventory()
+    /// <param name="sourceInventory">Inventory containing the dragged item.</param>
+    /// <param name="sourceIndex">Index in the source inventory.</param>
+    /// <param name="destinationInventory">Inventory where the item is being dropped.</param>
+    /// <param name="destinationIndex">Index in the destination inventory.</param>
+    public void TransferItem(Inventory_Copilot sourceInventory, int sourceIndex, Inventory_Copilot destinationInventory, int destinationIndex)
     {
-        for (int i = 0; i < slots.Count; i++)
+        // Validate inputs.
+        if (sourceInventory == null || destinationInventory == null)
         {
-            slots[i].item = null;
+            Debug.LogWarning("TransferItem: One or both inventories are null.");
+            return;
         }
-        OnInventoryChanged?.Invoke();
-        Debug.Log("Inventory cleared.");
+        if (sourceIndex < 0 || sourceIndex >= sourceInventory.slots.Count ||
+            destinationIndex < 0 || destinationIndex >= destinationInventory.slots.Count)
+        {
+            Debug.LogWarning("TransferItem: Invalid slot indices.");
+            return;
+        }
+
+        InventorySlot_Copilot sourceSlot = sourceInventory.slots[sourceIndex];
+        InventorySlot_Copilot destSlot = destinationInventory.slots[destinationIndex];
+
+        // Swap the items (this logic works whether destination is empty or not).
+        ItemSO_Copilot temp = destSlot.item;
+        destSlot.item = sourceSlot.item;
+        sourceSlot.item = temp;
+
+        // Refresh UI on both inventories.
+        sourceInventory.RefreshInventoryUI();
+        if (sourceInventory != destinationInventory)
+            destinationInventory.RefreshInventoryUI();
+    }
+
+    /// <summary>
+    /// Transfers an item from a source inventory at a given slot index to the first empty slot of the external inventory.
+    /// </summary>
+    /// <param name="sourceInventory">The Inventory from which to remove the item.</param>
+    /// <param name="sourceIndex">The index in the source inventory where the item currently is.</param>
+    /// <param name="externalInventory">The target external Inventory in which to place the item.</param>
+    /// <returns>True if the transfer was successful, false otherwise.</returns>
+    public bool MoveItemToExternalInventory(GameObject sourceInventory, int sourceIndex, GameObject externalInventory)
+    {
+        // Validate inventories and source index.
+        if (sourceInventory == null || externalInventory == null)
+        {
+            Debug.LogError("MoveItemToExternalInventory: One or both inventory references are null.");
+
+            if (sourceInventory == null)
+                Debug.LogError(this.name + " MoveItemToExternalInventory: sourceInventory references are null.");
+
+            if (externalInventory == null)
+                Debug.LogError("MoveItemToExternalInventory: externalInventory references are null.");
+
+            return false;
+        }
+
+        Inventory_Copilot invnetory = sourceInventory.GetComponent<Inventory_Copilot>();
+
+        if (sourceIndex < 0 || sourceIndex >= invnetory.slots.Count)
+        {
+            Debug.LogError("MoveItemToExternalInventory: Invalid source index.");
+            return false;
+        }
+        // Check if the source slot actually has an item.
+        if (invnetory.slots[sourceIndex].item == null)
+        {
+            Debug.Log("MoveItemToExternalInventory: Source slot is empty. No item to move.");
+            return false;
+        }
+
+        Inventory_Copilot ex_invnetory = externalInventory.GetComponent<Inventory_Copilot>();
+
+        // Scan for the first empty slot in the external inventory.
+        int targetIndex = -1;
+        for (int i = 0; i < ex_invnetory.slots.Count; i++)
+        {
+            if (ex_invnetory.slots[i].item == null)
+            {
+                targetIndex = i;
+                break;
+            }
+        }
+        if (targetIndex == -1)
+        {
+            Debug.Log("MoveItemToExternalInventory: External inventory is full.");
+            return false;
+        }
+
+        // Transfer the item.
+        ex_invnetory.slots[targetIndex].item = invnetory.slots[sourceIndex].item;
+        invnetory.slots[sourceIndex].item = null;
+
+        // Refresh both UI panels.
+        invnetory.RefreshInventoryUI();
+        if (sourceInventory.GetComponent<ExternalInventory_Copilot>()) sourceInventory.GetComponent<ExternalInventory_Copilot>().RefreshExternalInventoryUI();
+
+        ex_invnetory.RefreshInventoryUI();
+        if (externalInventory.GetComponent<ExternalInventory_Copilot>()) externalInventory.GetComponent<ExternalInventory_Copilot>().RefreshExternalInventoryUI();
+
+        Debug.Log("Item moved from source slot " + sourceIndex +
+                  " to external inventory slot " + targetIndex);
+        return true;
     }
 }

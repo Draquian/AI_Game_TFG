@@ -1,122 +1,134 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections.Generic;
 
 public class InventoryUI_Copilot : MonoBehaviour
 {
-    [Header("UI References")]
+    [Header("Player Inventory UI Setup")]
+    [Tooltip("Reference to the player's Inventory component.")]
     public Inventory_Copilot playerInventory;
-    public GameObject slotPrefab;   // Must include an Image and the SlotUI component.
-    public Transform inventoryPanel; // Parent panel for the inventory grid.
 
-    [Header("Grid Layout Options")]
+    [Tooltip("Prefab for an individual inventory slot. This prefab should have the SlotUI component.")]
+    public GameObject slotPrefab;
+
+    [Tooltip("Parent transform for the slot UI objects.")]
+    public Transform slotParent;
+
+    [Tooltip("Number of columns in the grid layout.")]
     public int columns = 5;
-    public float slotSpacing = 10f;
+    [Tooltip("Width and height size of each slot.")]
     public Vector2 slotSize = new Vector2(80, 80);
+    [Tooltip("Spacing between slots.")]
+    public float slotSpacing = 10f;
+    [Tooltip("Margin (offset) from the top-left corner of the panel.")]
+    public Vector2 margin = new Vector2(10, 10);
 
-    // List of instantiated slot GameObjects.
+    // List to keep track of instantiated slot UI objects.
     private List<GameObject> slotGameObjects = new List<GameObject>();
 
     private void Start()
     {
+        if (playerInventory == null)
+        {
+            Debug.LogError("InventoryUI: No player inventory assigned!");
+            return;
+        }
+
+        // Subscribe to inventory changes.
+        playerInventory.OnInventoryChanged += RefreshUI;
+
+        // Build the initial UI.
         RefreshUI();
     }
 
     /// <summary>
-    /// Instantiates slots based on the player's inventory data, assigns drag-and-drop functionality,
-    /// and lays out the slots on the panel.
+    /// Refreshes the player's Inventory UI:
+    /// Destroys any existing slot objects and instantiates new ones based on the current contents of the inventory.
     /// </summary>
     public void RefreshUI()
     {
         // Clear previous slots.
-        foreach (var slotGO in slotGameObjects)
+        foreach (Transform child in slotParent)
         {
-            Destroy(slotGO);
+            Destroy(child.gameObject);
         }
         slotGameObjects.Clear();
 
-        for (int i = 0; i < playerInventory.totalSlots; i++)
+        int numSlots = playerInventory.slots.Count;
+        for (int i = 0; i < numSlots; i++)
         {
-            GameObject slotGO = Instantiate(slotPrefab, inventoryPanel);
-            slotGO.name = "Slot " + i;
+            // Instantiate slot prefab as child of the parent panel.
+            GameObject newSlot = Instantiate(slotPrefab, slotParent);
+            newSlot.name = "Slot " + i;
 
-            // Update the UI with the appropriate icon if an item exists in this inventory slot.
+            // Get the RectTransform of the slot.
+            RectTransform slotRect = newSlot.GetComponent<RectTransform>();
+            // Set the slot size.
+            slotRect.sizeDelta = slotSize;
+
+            // Calculate grid position.
+            int col = i % columns;
+            int row = i / columns;
+
+            // x-position: margin + (slot width + spacing) * column index.
+            float xPos = margin.x + col * (slotSize.x + slotSpacing);
+            // y-position: negative margin - (slot height + spacing) * row index.
+            // Negative because in UI anchoredPosition, moving down the panel decreases Y.
+            float yPos = -margin.y - row * (slotSize.y + slotSpacing);
+
+            // Set the anchored position. (If the parent's pivot is top-left (0,1), this will properly start at the top-left corner.)
+            slotRect.anchoredPosition = new Vector2(xPos, yPos);
+
+            // Here, update the visuals for each slot.
+            SlotUI_Copilot slotUI = newSlot.GetComponent<SlotUI_Copilot>();
+            if (slotUI == null)
+            {
+                slotUI = newSlot.AddComponent<SlotUI_Copilot>();
+            }
+            slotUI.slotIndex = i;
+            slotUI.owningInventory = playerInventory;
+            slotUI.inventoryController = playerInventory; // For player inventory, the controller is itself.
+
+            // Assume that in your slot prefab you have a background Image that is always enabled.
+            Image backgroundImage = newSlot.GetComponent<Image>();
+            if (backgroundImage != null)
+            {
+                // Make sure the Raycast Target is enabled.
+                backgroundImage.raycastTarget = true;
+                // Optionally, if you want the background to be invisible but still interactable:
+                Color bgColor = backgroundImage.color;
+                bgColor.a = 0.0f; // Make it fully transparent.
+                backgroundImage.color = bgColor;
+            }
+
+            // For the item icon (child Image that shows the item) do not disable its Raycast Target,
+            // just set its alpha to 0 when there's no item.
+            Image iconImage = newSlot.GetComponentInChildren<Image>(); // This could be a separate object.
             InventorySlot_Copilot slotData = playerInventory.slots[i];
-            Image iconImage = slotGO.GetComponentInChildren<Image>();
             if (slotData.item != null && slotData.item.icon != null)
             {
                 iconImage.sprite = slotData.item.icon;
-                iconImage.enabled = true;
+                // Fully opaque for an item.
+                iconImage.color = new Color(1, 1, 1, 1);
             }
             else
             {
-                iconImage.enabled = false;
+                // Clear the icon but ensure it still receives events (if needed).
+                iconImage.color = new Color(1, 1, 1, 0);
+                // Or, if you rely solely on the background for drop detection, you might not
+                // need to modify iconImage's Raycast Target.
             }
 
-            // Example: for the first few slots (hotbar), add a special marker/color.
-            if (i < playerInventory.hotbarSlots)
-            {
-                if (i == 0)
-                    slotGO.GetComponent<Image>().color = Color.cyan;  // The class slot.
-            }
-
-            // Make sure the slot has the drag-and-drop script.
-            SlotUI_Copilot slotUI = slotGO.GetComponent<SlotUI_Copilot>();
-            if (slotUI == null)
-                slotUI = slotGO.AddComponent<SlotUI_Copilot>();
-            slotUI.slotIndex = i;
-            slotUI.inventoryUI = this;
-
-            slotGameObjects.Add(slotGO);
+            slotGameObjects.Add(newSlot);
         }
-
-        // Arrange slots in a grid layout.
-        DistributeSlots();
     }
 
-    /// <summary>
-    /// Manually positions each slot in the inventory panel using grid parameters.
-    /// </summary>
-    private void DistributeSlots()
+    private void OnDestroy()
     {
-        // Compute total rows required.
-        int totalSlots = slotGameObjects.Count;
-        int rows = Mathf.CeilToInt((float)totalSlots / columns);
-
-        // Iterate over each slot and calculate a new anchored position.
-        for (int i = 0; i < totalSlots; i++)
+        // Unsubscribe from the event to avoid memory leaks.
+        if (playerInventory != null)
         {
-            int row = i / columns;
-            int col = i % columns;
-            RectTransform slotRect = slotGameObjects[i].GetComponent<RectTransform>();
-
-            // Calculate the position based on column, row, slot size, and spacing.
-            float xPos = col * (slotSize.x + slotSpacing);
-            float yPos = -row * (slotSize.y + slotSpacing);  // negative y moves the slot downward
-
-            slotRect.anchoredPosition = new Vector2(xPos, yPos);
-            slotRect.sizeDelta = slotSize;
-        }
-    }
-
-    /// <summary>
-    /// Called when a drag-and-drop operation completes.
-    /// Swaps the items in the inventory between two slot indices.
-    /// </summary>
-    public void SwapSlots(int indexA, int indexB)
-    {
-        playerInventory.SwapItems(indexA, indexB);
-    }
-
-    private void OnEnable()
-    {
-        if (playerInventory != null)
-            playerInventory.OnInventoryChanged += RefreshUI;
-    }
-
-    private void OnDisable()
-    {
-        if (playerInventory != null)
             playerInventory.OnInventoryChanged -= RefreshUI;
+        }
     }
 }

@@ -10,6 +10,7 @@ TagManager:
   - Gateway
   - Symbol
   - Enemy
+  - DragCanvas
   layers:
   - Default
   - TransparentFX

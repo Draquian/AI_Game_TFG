@@ -23,6 +23,6 @@ MonoBehaviour:
     - rid: 581056236167364628
       type: {class: OtherStats, ns: , asm: Assembly-CSharp}
       data:
-        itemName: 
-        description: 
-        isConsumable: 0
+        itemName: Consumable
+        description: Tis item can be consumable
+        isConsumable: 1
