@@ -100,7 +100,7 @@ public class ExternalInventory_Copilot : MonoBehaviour, IInteractable_Copilot
         if (playerInventory != null)
         {
             playerInventory.RefreshInventoryUI();
-            playerInventory.externalInv = gameObject;
+            playerInventory.externalInv = gameObject.GetComponent<ExternalInventory_Copilot>();
         }
 
         playerController.lockCameraRotation = true;
@@ -108,8 +108,6 @@ public class ExternalInventory_Copilot : MonoBehaviour, IInteractable_Copilot
         // Show and unlock the cursor when paused.
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
-
-
     }
 
     /// <summary>

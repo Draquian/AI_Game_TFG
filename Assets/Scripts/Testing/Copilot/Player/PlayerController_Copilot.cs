@@ -221,6 +221,12 @@ public class PlayerController_Copilot : MonoBehaviour
                 inventoryUI.slotParent.gameObject.SetActive(false);
                 lockCameraRotation = false;
 
+                if(playerStats.GetComponent<Inventory_Copilot>().externalInv != null)
+                {
+                    playerStats.GetComponent<Inventory_Copilot>().externalInv.CloseInventory();
+                    playerStats.GetComponent<Inventory_Copilot>().externalInv = null;
+                }
+
                 // Hide and lock the cursor when the game is resumed.
                 Cursor.visible = false;
                 Cursor.lockState = CursorLockMode.Locked;

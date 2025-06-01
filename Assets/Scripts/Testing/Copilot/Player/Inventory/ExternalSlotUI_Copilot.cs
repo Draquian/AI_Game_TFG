@@ -147,9 +147,6 @@ public class ExternalSlotUI_Copilot : MonoBehaviour, IBeginDragHandler, IDragHan
         // Check for a right mouse click.
         if (eventData.button == PointerEventData.InputButton.Right)
         {
-            Debug.Log(owningInventory.name);
-            Debug.Log(inventoryController.name);
-
             // We only want to move items from the player's inventory.
             // In our setup, player's slots have owningInventory == inventoryController.
             if (owningInventory == inventoryController)
@@ -157,7 +154,6 @@ public class ExternalSlotUI_Copilot : MonoBehaviour, IBeginDragHandler, IDragHan
                 // Ensure a target external inventory is set.
                 if (playerInventoryTarget == null)
                 {
-                    Debug.Log("Player INvet");
                     playerInventoryTarget = GameObject.FindGameObjectWithTag("Player").GetComponent<Inventory_Copilot>(); ;
                 }
                 // Call the method on the Inventory Controller.

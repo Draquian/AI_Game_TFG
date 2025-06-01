@@ -15,7 +15,7 @@ public class Inventory_Copilot : MonoBehaviour
     public ItemSO_Copilot testItem1;
     public ItemSO_Copilot testItem2;
 
-    public GameObject externalInv;
+    public ExternalInventory_Copilot externalInv;
 
     private void Awake()
     {
@@ -38,11 +38,6 @@ public class Inventory_Copilot : MonoBehaviour
         {
             AddItem(testItem2);
         }
-        if (Input.GetKeyDown(KeyCode.Z))
-        {
-            MoveItemToExternalInventory(gameObject, 1, externalInv);
-        }
-
     }
 
     /// <summary>

@@ -135,7 +135,7 @@ public class SlotUI_Copilot : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         {
             // Check if the external inventory is open.
             // Retrieve the ExternalInventory component (assumes one exists in the scene).
-            ExternalInventory_Copilot extInv = GameObject.FindObjectOfType<ExternalInventory_Copilot>();
+            ExternalInventory_Copilot extInv = GameObject.FindGameObjectWithTag("Player").GetComponent<Inventory_Copilot>().externalInv;
             if (extInv == null || extInv.externalInventoryUIPanel == null ||
                 !extInv.externalInventoryUIPanel.activeSelf)
             {
