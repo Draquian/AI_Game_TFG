@@ -92,7 +92,7 @@ public class MazeGenerator_Copilot : MonoBehaviour
         // Press "S" Start
         if (Input.GetKeyDown(KeyCode.Backspace))
         {
-            GenerateMaze();
+            startRun();
         }
 
         // Press "N" to increase grid size and regenerate the maze.
@@ -108,6 +108,25 @@ public class MazeGenerator_Copilot : MonoBehaviour
                 gridSize--;
                 GenerateMaze();
             }
+        }
+    }
+
+    public void startRun()
+    {
+        GenerateMaze();
+
+        GameObject player = GameObject.FindWithTag("Player");
+        ItemSO_Copilot item = player.GetComponent<Inventory_Copilot>().slots[0].item;
+
+        if (item != null && item.itemType == ItemSO_Copilot.ItemType.Weapon)
+        {
+            WeaponStats weapon = item.stats as WeaponStats;
+            player.GetComponent<PlayerStats_Copilot>().playerClass = weapon.classTpye;
+            Debug.Log("Class type: " + weapon.classTpye);
+        }
+        else
+        {
+            Debug.Log("Non weapon was in the first slot");
         }
     }
 

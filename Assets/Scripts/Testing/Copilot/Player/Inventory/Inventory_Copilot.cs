@@ -12,10 +12,12 @@ public class Inventory_Copilot : MonoBehaviour
     // Event for UI refresh; UI scripts subscribe to this event.
     public event Action OnInventoryChanged;
 
+    public ExternalInventory_Copilot externalInv;
+
+
+
     public ItemSO_Copilot testItem1;
     public ItemSO_Copilot testItem2;
-
-    public ExternalInventory_Copilot externalInv;
 
     private void Awake()
     {

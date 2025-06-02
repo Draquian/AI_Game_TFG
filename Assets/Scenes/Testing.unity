@@ -2715,8 +2715,6 @@ MonoBehaviour:
   columns: 5
   slotSpacing: 10
   slotSize: {x: 80, y: 80}
-  testItem1: {fileID: 11400000, guid: 4071c77a5e4f1a747b193262c80d3f02, type: 2}
-  testItem2: {fileID: 11400000, guid: d535f929ff6278544948cdf44c78f96e, type: 2}
 --- !u!1 &686827967
 GameObject:
   m_ObjectHideFlags: 0
@@ -4861,8 +4859,6 @@ MonoBehaviour:
   columns: 5
   slotSpacing: 10
   slotSize: {x: 80, y: 80}
-  testItem1: {fileID: 11400000, guid: 4071c77a5e4f1a747b193262c80d3f02, type: 2}
-  testItem2: {fileID: 11400000, guid: d535f929ff6278544948cdf44c78f96e, type: 2}
 --- !u!136 &1244198342
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -4957,7 +4953,7 @@ GameObject:
   - component: {fileID: 1267310308}
   - component: {fileID: 1267310307}
   m_Layer: 0
-  m_Name: CubeTest
+  m_Name: Item
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

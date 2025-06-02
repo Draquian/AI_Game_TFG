@@ -36,10 +36,6 @@ public class ExternalInventory_Copilot : MonoBehaviour, IInteractable_Copilot
     public Vector2 slotSize = new Vector2(80, 80);
 
 
-    public ItemSO_Copilot testItem1;
-    public ItemSO_Copilot testItem2;
-
-
     private void Start()
     {
         // Initialize external inventory if it has not been assigned.
@@ -64,8 +60,7 @@ public class ExternalInventory_Copilot : MonoBehaviour, IInteractable_Copilot
 
         externalSlotParent = externalInventoryUIPanel.transform;
 
-        externalInventory.AddItem(testItem1);
-        externalInventory.AddItem(testItem2);
+        PopulateChest();
     }
 
     // Subscribe to the external inventory change event so that the UI refreshes automatically.
@@ -310,5 +305,38 @@ public class ExternalInventory_Copilot : MonoBehaviour, IInteractable_Copilot
 
             slotRect.anchoredPosition = new Vector2(xPos, yPos);
         }
+    }
+
+    public void PopulateChest()
+    {
+        // Load all items of type ItemSO from the Resources/Items folder.
+        ItemSO_Copilot[] availableItems = Resources.LoadAll<ItemSO_Copilot>("Items");
+        if (availableItems == null || availableItems.Length == 0)
+        {
+            Debug.LogWarning("No items found in Resources/Items folder!");
+            return;
+        }
+
+        // Define the probability to place an item in each slot (e.g., 30%).
+        float dropChance = 0.1f;
+
+        // Loop through each slot in the external inventory.
+        for (int i = 0; i < externalInventory.slots.Count; i++)
+        {
+            // With a probability of dropChance, randomly assign an item.
+            if (Random.value < dropChance)
+            {
+                int randomIndex = Random.Range(0, availableItems.Length);
+                externalInventory.slots[i].item = availableItems[randomIndex];
+            }
+            else
+            {
+                // Otherwise, leave the slot empty.
+                externalInventory.slots[i].item = null;
+            }
+        }
+
+        // Refresh the external inventory UI to reflect these changes.
+        RefreshExternalInventoryUI();
     }
 }
