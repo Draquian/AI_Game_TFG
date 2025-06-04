@@ -172,10 +172,10 @@ public class ExternalInventory_Copilot : MonoBehaviour, IInteractable_Copilot
         externalSlotGameObjects.Clear();
 
         // Grid layout settings.
-        int columns = 4;         // number of columns per row
-        float slotSpacing = 10f; // space between slots
+        int columns = 5;         // number of columns per row
+        float slotSpacing = 25f; // space between slots
         Vector2 slotSize = new Vector2(80, 80);
-        Vector2 margin = new Vector2(10, 10); // offset from the top-left corner
+        Vector2 margin = new Vector2(50, 50); // offset from the top-left corner
 
         // Make sure the parent has a RectTransform.
         RectTransform parentRect = externalSlotParent.GetComponent<RectTransform>();

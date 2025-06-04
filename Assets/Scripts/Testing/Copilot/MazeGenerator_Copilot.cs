@@ -8,6 +8,7 @@ public class MazeGenerator_Copilot : MonoBehaviour
     public Room passagewayRoom = null;
     public Room specialRoom = null;
     public Room returnRoom = null;
+    public Room startRoom = null;
 
     public float specialLootSpawnChance = 0.25f; // 50% chance for the special room to spawn
 
@@ -103,11 +104,7 @@ public class MazeGenerator_Copilot : MonoBehaviour
         // Press "P" to decrease grid size (minimum 3) and regenerate the maze.
         else if (Input.GetKeyDown(KeyCode.P))
         {
-            if (gridSize > 3)
-            {
-                gridSize--;
-                GenerateMaze();
-            }
+            preLevel();
         }
     }
 
@@ -134,6 +131,15 @@ public class MazeGenerator_Copilot : MonoBehaviour
     {
         gridSize++;
         GenerateMaze();
+    }
+
+    public void preLevel()
+    {
+        if (gridSize > 3)
+        {
+            gridSize--;
+            GenerateMaze();
+        }
     }
 
     // GenerateMaze creates the grid of cells and connects them via corridors.
@@ -700,7 +706,7 @@ public class MazeGenerator_Copilot : MonoBehaviour
         if (validRooms.Count > 0)
         {
 
-            Room startRoom = validRooms[Random.Range(0, validRooms.Count)];
+            startRoom = validRooms[Random.Range(0, validRooms.Count)];
             GameObject player = GameObject.FindWithTag("Player");
             if (player != null)
             {
@@ -768,6 +774,17 @@ public class MazeGenerator_Copilot : MonoBehaviour
         {
             PlacePlayer(BRDistance - 1);
             Debug.LogError("No valid player spawn rooms found! The grid may be too small.");
+        }
+
+        // Call PlaceInStartRoom() on the PreLevelTrigger.
+        PreLevelTrigger_Copilot preLevelTrigger = FindObjectOfType<PreLevelTrigger_Copilot>();
+        if (preLevelTrigger != null)
+        {
+            preLevelTrigger.PlaceInStartRoom();
+        }
+        else
+        {
+            Debug.LogWarning("PreLevelTrigger not found in the scene.");
         }
     }
 

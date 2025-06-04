@@ -25,7 +25,7 @@ MonoBehaviour:
       data:
         itemName: 
         description: 
-        classTpye: 0
+        classTpye: 3
         magicType: 0
         weight: 0
         damage: 0

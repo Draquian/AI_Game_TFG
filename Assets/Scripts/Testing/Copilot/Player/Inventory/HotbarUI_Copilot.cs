@@ -111,8 +111,8 @@ public class HotbarUI_Copilot : MonoBehaviour
             RectTransform rt = slotGameObjects[i].GetComponent<RectTransform>();
 
             // Calculate a new anchored position so that slots are spaced out evenly.
-            float xPos = (i * (slotSize.x + slotSpacing)) - 150;
-            rt.anchoredPosition = new Vector2(xPos, 0);
+            float xPos = (i * (slotSize.x + slotSpacing)) + 25;
+            rt.anchoredPosition = new Vector2(xPos, -35);
             rt.sizeDelta = slotSize;
         }
     }

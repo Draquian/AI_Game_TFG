@@ -5,7 +5,7 @@ using UnityEngine;
 public class Inventory_Copilot : MonoBehaviour
 {
     [Header("Inventory Settings")]
-    public int totalSlots = 20;
+    public int totalSlots = 35;
     public int hotbarSlots = 4;
     public List<InventorySlot_Copilot> slots = new List<InventorySlot_Copilot>();
 
