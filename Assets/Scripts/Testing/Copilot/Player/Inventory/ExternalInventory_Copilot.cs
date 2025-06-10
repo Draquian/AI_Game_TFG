@@ -34,6 +34,7 @@ public class ExternalInventory_Copilot : MonoBehaviour, IInteractable_Copilot
     public float slotSpacing = 10f;
     [Tooltip("Size for each external inventory slot (width x height).")]
     public Vector2 slotSize = new Vector2(80, 80);
+    public Vector2 margin = new Vector2(50, 50);
 
 
     private void Start()
@@ -181,12 +182,6 @@ public class ExternalInventory_Copilot : MonoBehaviour, IInteractable_Copilot
             Destroy(slot);
         }
         externalSlotGameObjects.Clear();
-
-        // Grid layout settings.
-        int columns = 5;         // number of columns per row
-        float slotSpacing = 25f; // space between slots
-        Vector2 slotSize = new Vector2(80, 80);
-        Vector2 margin = new Vector2(50, 50); // offset from the top-left corner
 
         // Make sure the parent has a RectTransform.
         RectTransform parentRect = externalSlotParent.GetComponent<RectTransform>();
