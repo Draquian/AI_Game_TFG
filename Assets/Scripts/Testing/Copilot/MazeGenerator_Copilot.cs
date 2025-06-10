@@ -140,6 +140,10 @@ public class MazeGenerator_Copilot : MonoBehaviour
             gridSize--;
             GenerateMaze();
         }
+        else
+        {
+            LoadingScreenManager_Copilot.Instance.LoadSceneWithLoadingScreen("Base");
+        }
     }
 
     // GenerateMaze creates the grid of cells and connects them via corridors.
@@ -199,8 +203,8 @@ public class MazeGenerator_Copilot : MonoBehaviour
                     // its default value (Vector3.one) already yields an effective dimension equal to (room.width, floorThickness, room.depth)
                     // due to the scale.
                     // Nevertheless, we explicitly re-set these values:
-                    boxCol.center = new Vector3(0,3,0);  // ensure the collider is centered
-                    boxCol.size = new Vector3(1, 6, 1); ;       // so that effective collider size = Vector3.one * transform.localScale.
+                    boxCol.center = new Vector3(0,1,0);  // ensure the collider is centered
+                    boxCol.size = new Vector3(1, 3, 1); ;       // so that effective collider size = Vector3.one * transform.localScale.
                 }
                 else
                 {

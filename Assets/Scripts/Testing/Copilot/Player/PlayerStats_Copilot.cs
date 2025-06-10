@@ -10,12 +10,19 @@ public class PlayerStats_Copilot : MonoBehaviour
     public float criticalDamage = 1.5f;
     public float speed = 5f;
     public float HP = 100f;
+    public float maxHP = 100f;
     public float Mana = 50f;
+    public float maxMana = 50f;
     public float strength = 10f;
 
     // Stamina variables.
     public float stamina = 100f;
     public float maxStamina = 100f;  // Maximum stamina value.
+
+    // Recovery amounts.
+    public float staminaRecoveryAmount = 5f;
+    public float hpRecoveryAmount = 5f;
+    public float manaRecoveryAmount = 3f;
 
     // Attack radius for detecting enemies.
     public float attackRadius = 1.5f;
@@ -58,9 +65,32 @@ public class PlayerStats_Copilot : MonoBehaviour
         }
     }
 
+    void Start()
+    {
+        // Set up periodic recovery every 10 seconds.
+        InvokeRepeating("RecoverStats", 10f, 5f);
+    }
+
+    // RecoverStats() is called every 10 seconds.
+    void RecoverStats()
+    {
+        if (stamina < maxStamina)
+        {
+            RecoverStamina(staminaRecoveryAmount);
+        }
+        if (HP < maxHP)
+        {
+            RecoverHP(hpRecoveryAmount);
+        }
+        if (Mana < maxMana)
+        {
+            RecoverMana(manaRecoveryAmount);
+        }
+    }
+
     public void Attack()
     {
-        float staminaCost = 10f;
+        float staminaCost = 5f;
 
         if (stamina >= staminaCost)
         {
@@ -88,17 +118,30 @@ public class PlayerStats_Copilot : MonoBehaviour
     }
 
     /// <summary>
-    /// Recovers a specified amount of stamina up to the maxStamina value.
+    /// RecoverStamina() increases stamina by the specified amount without exceeding maxStamina.
     /// </summary>
-    /// <param name="amount">The amount of stamina to recover.</param>
     public void RecoverStamina(float amount)
     {
-        stamina += amount;
-        if (stamina > maxStamina)
-        {
-            stamina = maxStamina;
-        }
-        Debug.Log("Recovered stamina. Current stamina: " + stamina);
+        stamina = Mathf.Min(stamina + amount, maxStamina);
+        Debug.Log("Stamina recovered. Current stamina: " + stamina);
+    }
+
+    /// <summary>
+    /// RecoverHP() increases HP by the specified amount without exceeding maxHP.
+    /// </summary>
+    public void RecoverHP(float amount)
+    {
+        HP = Mathf.Min(HP + amount, maxHP);
+        Debug.Log("HP recovered. Current HP: " + HP);
+    }
+
+    /// <summary>
+    /// RecoverMana() increases Mana by the specified amount without exceeding maxMana.
+    /// </summary>
+    public void RecoverMana(float amount)
+    {
+        Mana = Mathf.Min(Mana + amount, maxMana);
+        Debug.Log("Mana recovered. Current Mana: " + Mana);
     }
 
     // Deduct HP, using physical defense

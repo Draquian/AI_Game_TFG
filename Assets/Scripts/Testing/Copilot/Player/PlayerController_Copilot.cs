@@ -149,7 +149,7 @@ public class PlayerController_Copilot : MonoBehaviour
                 {
                     if (playerStats.magicAbility != null)
                     {
-                        playerStats.magicAbility.MagicChargedAttack();
+                        playerStats.magicAbility.MagicChargedAttack(playerStats.magicalDamage, magicChargeTimer);
                     }
                 }
                 else
@@ -157,11 +157,15 @@ public class PlayerController_Copilot : MonoBehaviour
                     // Otherwise, perform a normal magic attack.
                     if (playerStats.magicAbility != null)
                     {
-                        playerStats.magicAbility.MagicAttack();
+                        playerStats.magicAbility.MagicAttack(playerStats.magicalDamage);
                     }
                 }
                 isChargingMagic = false;
             }
+        }
+        if (Input.GetButtonDown("Jump"))
+        {
+            playerStats.magicAbility.MagicBoost(playerStats.magicalDamage);
         }
     }
 

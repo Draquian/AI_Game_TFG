@@ -11,6 +11,8 @@ TagManager:
   - Symbol
   - Enemy
   - DragCanvas
+  - Water
+  - Title
   layers:
   - Default
   - TransparentFX

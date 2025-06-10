@@ -57,6 +57,10 @@ public class ExternalInventory_Copilot : MonoBehaviour, IInteractable_Copilot
             externalInventoryUIPanel.SetActive(false);
         if (playerInventoryUIPanel != null)
             playerInventoryUIPanel.SetActive(false);
+        else
+        {
+            playerInventoryUIPanel = GameObject.Find("Player_Inventory");
+        }
 
         externalSlotParent = externalInventoryUIPanel.transform;
 
@@ -96,6 +100,13 @@ public class ExternalInventory_Copilot : MonoBehaviour, IInteractable_Copilot
         {
             playerInventory.RefreshInventoryUI();
             playerInventory.externalInv = gameObject.GetComponent<ExternalInventory_Copilot>();
+        }
+        else
+        {
+            GameObject aux = GameObject.FindGameObjectWithTag("Player");
+            playerInventory = aux.GetComponent<Inventory_Copilot>();
+            Debug.LogError(playerInventory);
+
         }
 
         playerController.lockCameraRotation = true;

@@ -17,8 +17,6 @@ public class PreLevelTrigger_Copilot : MonoBehaviour, IInteractable_Copilot
     {
         if (mazeGenerator != null)
         {
-            Debug.LogError("INteracetd");
-
             // Call the preLevel() function in MazeGenerator.
             mazeGenerator.preLevel();
         }

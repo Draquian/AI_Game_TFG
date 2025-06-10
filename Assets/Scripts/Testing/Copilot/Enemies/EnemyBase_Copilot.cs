@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class EnemyBase_Copilot : MonoBehaviour
 {
@@ -66,6 +67,10 @@ public class EnemyBase_Copilot : MonoBehaviour
         Debug.Log(enemyName + " has died!");
         GiveLoot();
         // Optionally, add death animations or effects here.
+
+        PlayerStats_Copilot playerObj = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerStats_Copilot>(); ;
+        playerObj.GainExperience(Random.Range(15, 75));
+
         Destroy(gameObject);
     }
 
@@ -98,4 +103,18 @@ public class EnemyBase_Copilot : MonoBehaviour
     }
 
     // Additional functionality—such as movement, AI decision making, etc.—can be added here and/or in derived classes.
+
+    public virtual void ApplySlow(float slowDuration)
+    {
+        float OGmovementSpeed = movementSpeed;
+        movementSpeed = movementSpeed / 2;
+
+        StartCoroutine(RevertSlow(OGmovementSpeed, slowDuration));
+    }
+
+    IEnumerator RevertSlow(float og, float slowDuration)
+    {
+        yield return new WaitForSeconds(slowDuration);
+        movementSpeed = og;
+    }
 }

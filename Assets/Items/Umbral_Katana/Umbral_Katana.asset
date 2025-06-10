@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1a3f580a1d74604d8e067898543e6ee, type: 3}
+  m_Name: Umbral_Katana
+  m_EditorClassIdentifier: 
+  icon: {fileID: 21300000, guid: 13450ca22d0d3004abebf593fb4ab76b, type: 3}
+  worldModelPrefab: {fileID: 6750862331617840469, guid: c57379dbaf1b813428182a66a7743d5f, type: 3}
+  itemType: 0
+  stats:
+    rid: 1461786519678484480
+  references:
+    version: 2
+    RefIds:
+    - rid: 1461786519678484480
+      type: {class: WeaponStats, ns: , asm: Assembly-CSharp}
+      data:
+        itemName: Umbral Katana
+        description: 
+        classTpye: 2
+        magicType: 3
+        weight: 0
+        damage: 0
+        range: 0
+        durability: 0
+        attackSpeed: 0

@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: -1658399655549351178}
   m_Layer: 0
   m_Name: RottingScavenger
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -130,6 +130,7 @@ MonoBehaviour:
   enemyName: Enemy
   description: Default enemy description
   maxHP: 100
+  currentHP: 0
   physicalAttackDamage: 10
   physicalDefense: 5
   magicalDamage: 0

@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: -1018763520520307912}
   m_Layer: 0
   m_Name: VenomousSpitter
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -130,6 +130,7 @@ MonoBehaviour:
   enemyName: Enemy
   description: Default enemy description
   maxHP: 100
+  currentHP: 0
   physicalAttackDamage: 10
   physicalDefense: 5
   magicalDamage: 0
@@ -140,3 +141,5 @@ MonoBehaviour:
   lootDropChance: 0.5
   poisonProjectilePrefab: {fileID: 0}
   projectileSpeed: 10
+  projectileSpawnOffsetY: 1
+  projectileDamage: 10
