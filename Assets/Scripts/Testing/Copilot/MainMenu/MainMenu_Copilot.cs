@@ -26,6 +26,15 @@ public class MainMenu_Copilot : MonoBehaviour
     // Resolutions array for video settings
     private Resolution[] resolutions;
 
+    public TMP_Text masterValue;
+    public TMP_Text musicValue;
+    public TMP_Text sfxValue;
+
+    private PauseManager_Copilot pManager;
+    private PlayerController_Copilot pControl;
+    private Inventory_Copilot pInventory;
+    private PlayerStats_Copilot pStats;
+
     // Start is called before the first frame update
     private void Start()
     {
@@ -45,7 +54,16 @@ public class MainMenu_Copilot : MonoBehaviour
                 currentResolutionIndex = i;
             }
         }
-        
+
+        if (pControl == null)
+            pControl = FindAnyObjectByType<PlayerController_Copilot>();
+
+        if (pInventory == null)
+            pInventory = FindAnyObjectByType<Inventory_Copilot>();
+
+        if(pStats ==null)
+            pStats = FindAnyObjectByType<PlayerStats_Copilot>();
+
         resolutionDropdown.AddOptions(options);
         resolutionDropdown.value = currentResolutionIndex;
         resolutionDropdown.RefreshShownValue();
@@ -56,7 +74,10 @@ public class MainMenu_Copilot : MonoBehaviour
         musicSlider.value = AudioManager.Instance != null ? AudioManager.Instance.GetMusicVolume() : 1f;
         sfxSlider.value = AudioManager.Instance != null ? AudioManager.Instance.GetSfxVolume() : 1f;
         uiScaleSlider.value = UIManager.Instance != null ? UIManager.Instance.GetScale() : 1f;
-        //mouseSensitivitySlider.value = PlayerController.Instance != null ? PlayerController.Instance.GetMouseSensitivity() : 1f;
+        masterValue.text = AudioManager.Instance != null ? AudioManager.Instance.masterVolume.ToString() : "100";
+        musicValue.text = AudioManager.Instance != null ? AudioManager.Instance.musicVolume.ToString() : "100";
+        sfxValue.text = AudioManager.Instance != null ? AudioManager.Instance.sfxVolume.ToString() : "100";
+        mouseSensitivitySlider.value = pControl != null ? pControl.GetCameraSensitivity() : 1f;
     }
 
     // Called when "New Game" is triggered
@@ -65,8 +86,25 @@ public class MainMenu_Copilot : MonoBehaviour
         // Reset save file (must be implemented in your SaveSystem, for example using PlayerPrefs or file I/O)
         SaveSystem_Copilot.DeleteSaveFile();
 
+        SaveSystem_Copilot.EnsureSaveFileExists();
+
         // Load the new game scene
-        SceneManager.LoadScene("GameScene"); // Replace "GameScene" with your actual scene name
+        LoadingScreenManager_Copilot.Instance.LoadSceneWithLoadingScreen("Base");
+        //SceneManager.LoadScene("Base"); // Replace "GameScene" with your actual scene name
+    }
+
+    public void MainMenu()
+    {
+        // Reset save file (must be implemented in your SaveSystem, for example using PlayerPrefs or file I/O)
+        SaveManager.Instance.SaveGame(SceneManager.GetActiveScene().name);
+        SaveManager.Instance.SaveGame(pControl.transform);
+        SaveManager.Instance.SaveGame(pInventory);
+        SaveManager.Instance.SaveGame(pStats.magicType);
+        Debug.LogError(pStats.magicType);
+
+        // Load the new game scene
+        //LoadingScreenManager_Copilot.Instance.LoadSceneWithLoadingScreen("MainMenu");
+        SceneManager.LoadScene("MainMenu");
     }
 
     // Called when "Continue" is triggered
@@ -89,6 +127,16 @@ public class MainMenu_Copilot : MonoBehaviour
         }
     }
 
+    public void pauseButton()
+    {
+        if(pManager == null)
+        {
+            pManager = FindAnyObjectByType<PauseManager_Copilot>();
+        }
+
+        pManager.TogglePause();
+    }
+
     // Exit function - Closes the game
     public void ExitGame()
     {
@@ -101,19 +149,28 @@ public class MainMenu_Copilot : MonoBehaviour
     public void SetMasterVolume(float volume)
     {
         if (AudioManager.Instance != null)
+        {
             AudioManager.Instance.SetMasterVolume(volume);
+            masterValue.text = AudioManager.Instance.masterVolume.ToString("0.01");
+        }
     }
 
     public void SetMusicVolume(float volume)
     {
         if (AudioManager.Instance != null)
+        {
             AudioManager.Instance.SetMusicVolume(volume);
+            musicValue.text = AudioManager.Instance.musicVolume.ToString("0.01");
+        }
     }
 
     public void SetSFXVolume(float volume)
     {
         if (AudioManager.Instance != null)
+        {
             AudioManager.Instance.SetSfxVolume(volume);
+            sfxValue.text = AudioManager.Instance.sfxVolume.ToString("0.01");
+        }
     }
 
     // Video settings management functions
@@ -147,7 +204,6 @@ public class MainMenu_Copilot : MonoBehaviour
 
     public void SetMouseSensitivity(float sensitivity)
     {
-        if (PlayerController_Copilot.Instance != null)
-            PlayerController_Copilot.Instance.SetCameraSensitivity(sensitivity);
+            pControl.SetCameraSensitivity(sensitivity);
     }
 }

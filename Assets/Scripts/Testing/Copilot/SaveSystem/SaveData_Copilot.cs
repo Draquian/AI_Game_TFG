@@ -11,8 +11,10 @@ public class SaveData_Copilot
     public float playerPosY;
     public float playerPosZ;
 
-    // Add additional game state information as needed
-    // For example:
-    // public int playerScore;
-    // public string playerName;
+    public PlayerStats_Copilot pStats;
+
+    // Add a field to store the inventory data.
+    public InventoryData_Copilot inventoryData;
+
+    public MagicType magic;
 }

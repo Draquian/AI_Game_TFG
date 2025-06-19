@@ -13,6 +13,7 @@ TagManager:
   - DragCanvas
   - Water
   - Title
+  - PauseMenu
   layers:
   - Default
   - TransparentFX

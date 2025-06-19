@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
 public class Inventory_Copilot : MonoBehaviour
 {
     [Header("Inventory Settings")]
@@ -13,8 +14,6 @@ public class Inventory_Copilot : MonoBehaviour
     public event Action OnInventoryChanged;
 
     public ExternalInventory_Copilot externalInv;
-
-
 
     public ItemSO_Copilot testItem1;
     public ItemSO_Copilot testItem2;

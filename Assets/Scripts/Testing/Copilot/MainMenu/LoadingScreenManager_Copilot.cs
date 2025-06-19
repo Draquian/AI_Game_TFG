@@ -9,6 +9,7 @@ public class LoadingScreenManager_Copilot : MonoBehaviour
 
     [Tooltip("UI GameObject that represents the loading screen panel.")]
     public GameObject loadingScreen;
+    public GameObject loadingprogresion;
 
     // (Optional) Add UI elements such as a progress bar:
     // public Slider progressBar;
@@ -42,25 +43,34 @@ public class LoadingScreenManager_Copilot : MonoBehaviour
 
     IEnumerator LoadSceneAsync(string sceneName)
     {
+        float minLoadingTime = 5f;
+        float startTime = Time.time;
+
         // Begin asynchronous scene loading.
         AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName);
         asyncLoad.allowSceneActivation = false;
 
+        //Image imageColor = loadingprogresion.GetComponent<Image>();
         while (!asyncLoad.isDone)
         {
-            // (Optional) Update the progress bar based on asyncLoad.progress.
-            // Example: progressBar.value = asyncLoad.progress;
+            // (Optional) Update progress UI if needed.
+            //imageColor.color = new Color(1,1,1, asyncLoad.progress);
 
-            // When progress is near 0.9, the scene is almost ready.
             if (asyncLoad.progress >= 0.9f)
             {
+                // Calculate elapsed time
+                float elapsed = Time.time - startTime;
+                if (elapsed < minLoadingTime)
+                {
+                    // Wait the remaining time so the loading screen shows for at least 5 seconds.
+                    yield return new WaitForSeconds(minLoadingTime - elapsed);
+                }
                 // Allow the scene to activate.
                 asyncLoad.allowSceneActivation = true;
             }
             yield return null;
         }
 
-        // Once scene is loaded, turn off the loading screen.
         if (loadingScreen != null)
         {
             loadingScreen.SetActive(false);

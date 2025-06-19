@@ -58,11 +58,14 @@ public class PortalManager_Copilot : MonoBehaviour, IInteractable_Copilot
         isPortalOpen = true;
         //portalObject.SetActive(true);
         portalTimer = basePortalOpenTime + (mazeLevel - 1) * 10f;
+        GetComponentInChildren<ParticleSystem>().Play();
     }
 
     private void ClosePortal()
     {
         isPortalOpen = false;
+
+        GetComponentInChildren<ParticleSystem>().Stop();
         //portalObject.SetActive(false);
     }
 
@@ -90,6 +93,8 @@ public class PortalManager_Copilot : MonoBehaviour, IInteractable_Copilot
         {
             ShowInteractionMenu();
         }
+
+        Debug.Log("NextLevel");
     }
 
     private void ShowInteractionMenu()

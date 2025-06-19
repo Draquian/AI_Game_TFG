@@ -28,6 +28,7 @@ public class PortalBase_Copilot : MonoBehaviour, IInteractable_Copilot
         if (other.CompareTag("Player"))
         {
             playerInRange = true;
+            GetComponentInChildren<ParticleSystem>().Play();
         }
     }
 
@@ -37,6 +38,8 @@ public class PortalBase_Copilot : MonoBehaviour, IInteractable_Copilot
         if (other.CompareTag("Player"))
         {
             playerInRange = false;
+            GetComponentInChildren<ParticleSystem>().Stop();
+
         }
     }
 

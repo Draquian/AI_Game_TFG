@@ -2,8 +2,6 @@ using UnityEngine;
 
 public class PlayerController_Copilot : MonoBehaviour
 {
-    public static PlayerController_Copilot Instance { get; private set; }
-
     private CharacterController characterController;
     private PlayerStats_Copilot playerStats;
     private Camera mainCamera;
@@ -243,5 +241,10 @@ public class PlayerController_Copilot : MonoBehaviour
     public void SetCameraSensitivity(float sensitivity)
     {
         cameraSensitivity = sensitivity * 2;
+    }
+
+    public float GetCameraSensitivity()
+    {
+        return cameraSensitivity;
     }
 }

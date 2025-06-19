@@ -86,7 +86,6 @@ public class WaterMagic_Copilot : MagicBase_Copilot
         // Passive: chance to drop water on the ground.
         if (Random.value < waterDropChance)
         {
-            Debug.Log("DROP ON NORMAL ATTACK");
             DropWater();
         }
     }
@@ -152,7 +151,6 @@ public class WaterMagic_Copilot : MagicBase_Copilot
         // Passive: chance to drop water on the ground.
         if (Random.value < waterDropChance)
         {
-            Debug.Log("DROP ON Charged ATTACK");
             DropWater();
         }
     }
@@ -255,7 +253,6 @@ public class WaterMagic_Copilot : MagicBase_Copilot
     /// </summary>
     private void DropWater()
     {
-        Debug.Log("WaterMagic: Dropping water on the ground.");
         GameObject waterDropPrefab = Resources.Load<GameObject>("Magic/Water/WaterDrop");
 
         if (waterDropPrefab != null)

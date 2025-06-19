@@ -10,6 +10,7 @@ public enum PlayerClass
     Tank
 }
 
+[System.Serializable]
 public enum MagicType
 {
     Electricity,

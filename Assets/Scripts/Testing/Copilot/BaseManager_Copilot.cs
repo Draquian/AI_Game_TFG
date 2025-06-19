@@ -110,10 +110,14 @@ public class BaseManager_Copilot : MonoBehaviour
         GameObject player = GameObject.FindWithTag("Player");
         if (player != null)
         {
-            // Place the player at the room center. Use floorThickness offset so the player is slightly above the floor.
-            Vector3 centerPosition = new Vector3(0, floorThickness + 1.0f, 0);
-            player.transform.position = centerPosition;
-            Debug.Log("Player placed at room center: " + centerPosition);
+            // Check if a save file exists
+            if (SaveSystem_Copilot.SaveFileExists())
+            {
+                // Load saved game data (this can include the last scene name, player stats, etc.)
+                SaveData_Copilot data = SaveSystem_Copilot.Load();
+
+                player.transform.position = new Vector3(data.playerPosX, data.playerPosY, data.playerPosZ);
+            }
         }
         else
         {
@@ -134,8 +138,9 @@ public class BaseManager_Copilot : MonoBehaviour
         if (player != null)
         {
             // Calculate the new position as a bit behind the player relative to its forward direction.
-            portalPosition = player.transform.position - player.transform.forward.normalized * portalBehindOffset;
+            //portalPosition = player.transform.position - player.transform.forward.normalized * portalBehindOffset;
             // Set the Y coordinate slightly above the floor level.
+            portalPosition = new Vector3(-1.5f, floorThickness + 10f, -8f);
             portalPosition.y = floorThickness + 1f;
         }
         else
@@ -149,7 +154,7 @@ public class BaseManager_Copilot : MonoBehaviour
         {
             // Instantiate the portal prefab at the computed position, set its rotation (here rotated to lie flat),
             // and parent it to the same GameObject that holds this script.
-            GameObject portal = Instantiate(portalPrefab, portalPosition, Quaternion.Euler(90f, 0f, 0f), this.transform);
+            GameObject portal = Instantiate(portalPrefab, portalPosition, Quaternion.Euler(0f, 0f, 0f), this.transform);
             Debug.Log("Portal prefab instantiated at " + portalPosition);
         }
         else

@@ -1,5 +1,6 @@
 using UnityEngine;
 
+[System.Serializable]
 public class PlayerStats_Copilot : MonoBehaviour
 {
     // Core Stats
@@ -35,34 +36,17 @@ public class PlayerStats_Copilot : MonoBehaviour
 
     // Magic ability (assigned in Awake).
     public MagicBase_Copilot magicAbility;
+    public MagicType magicType;
 
     public LayerMask enemyLayer;
 
     void Awake()
     {
         // Randomly assign a magic type for this game session.
-        MagicType randomMagicType = (MagicType)Random.Range(0, System.Enum.GetValues(typeof(MagicType)).Length);
-        Debug.Log("Assigned Magic Type: " + randomMagicType);
+        magicType = (MagicType)Random.Range(0, System.Enum.GetValues(typeof(MagicType)).Length);
+        Debug.Log("Assigned Magic Type: " + magicType);
 
-        // Dynamically attach the corresponding magic script to this game object.
-        switch (randomMagicType)
-        {
-            case MagicType.Electricity:
-                magicAbility = gameObject.AddComponent<ElectricityMagic_Copilot>();
-                break;
-            case MagicType.Fire:
-                magicAbility = gameObject.AddComponent<FireMagic_Copilot>();
-                break;
-            case MagicType.Water:
-                magicAbility = gameObject.AddComponent<WaterMagic_Copilot>();
-                break;
-            case MagicType.Shadow:
-                magicAbility = gameObject.AddComponent<ShadowMagic_Copilot>();
-                break;
-            case MagicType.Light:
-                magicAbility = gameObject.AddComponent<LightMagic_Copilot>();
-                break;
-        }
+        GetMagic(magicType);
     }
 
     void Start()
@@ -241,5 +225,28 @@ public class PlayerStats_Copilot : MonoBehaviour
         }
 
         Debug.Log("Player class changed to: " + playerClass);
+    }
+
+    public void GetMagic(MagicType randomMagicType)
+    {
+        // Dynamically attach the corresponding magic script to this game object.
+        switch (randomMagicType)
+        {
+            case MagicType.Electricity:
+                magicAbility = gameObject.AddComponent<ElectricityMagic_Copilot>();
+                break;
+            case MagicType.Fire:
+                magicAbility = gameObject.AddComponent<FireMagic_Copilot>();
+                break;
+            case MagicType.Water:
+                magicAbility = gameObject.AddComponent<WaterMagic_Copilot>();
+                break;
+            case MagicType.Shadow:
+                magicAbility = gameObject.AddComponent<ShadowMagic_Copilot>();
+                break;
+            case MagicType.Light:
+                magicAbility = gameObject.AddComponent<LightMagic_Copilot>();
+                break;
+        }
     }
 }

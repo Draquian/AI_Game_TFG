@@ -83,11 +83,6 @@ public class MazeGenerator_Copilot : MonoBehaviour
     // Array for storing all cells.
     private Room[] rooms;
 
-    // Start and Update.
-    void Start()
-    {
-    }
-
     void Update()
     {
         // Press "S" Start
@@ -278,11 +273,14 @@ public class MazeGenerator_Copilot : MonoBehaviour
         // Select a random Passageway Room and spawn the Portal.
         PlacePortal();
 
+        Debug.LogError(Random.value);
+
         // After placing boss and player, spawn the special loot with a probability.
         if (Random.value < specialLootSpawnChance)
         {
         // Finally, place the special loot in a random room.
             PlaceSpecialLoot();
+            Debug.LogError("PlaceLOOOOOT");
         }
         else
         {
@@ -887,7 +885,7 @@ public class MazeGenerator_Copilot : MonoBehaviour
         if (portal != null)
         {
             // Spawn the Portal at the center of the chosen Passageway Room.
-            portal.transform.position = new Vector3(passagewayRoom.center.x, floorThickness + 1.0f, passagewayRoom.center.z);
+            portal.transform.position = new Vector3(passagewayRoom.center.x, floorThickness + 3.0f, passagewayRoom.center.z);
         }
         else
         {
@@ -926,42 +924,58 @@ public class MazeGenerator_Copilot : MonoBehaviour
             return;
         }
 
+        // Create a temporary copy of the original sprite list.
+        List<Sprite> tempSpritePool = new List<Sprite>(spawnableSprites);
+
         // Shuffle the rooms list so that the placement is randomized.
         List<Room> roomList = new List<Room>(rooms);
+
+        // Remove the passagewayRoom from the list, so no object is spawned there.
+        if (passagewayRoom != null)
+        {
+            roomList.Remove(passagewayRoom);
+        }
+
         Shuffle(roomList);
 
         // Determine how many sprites to spawn.
         int numToSpawn = Mathf.Min(5, roomList.Count);
 
+        // Now spawn the remaining objects in random rooms.
         for (int i = 0; i < numToSpawn; i++)
         {
+            // Use the ith room from the shuffled list.
             Room targetRoom = roomList[i];
-
-            // Randomly select a sprite from the list.
-            int randomSpriteIndex = Random.Range(0, spawnableSprites.Count);
-            Sprite spriteToSpawn = spawnableSprites[randomSpriteIndex];
-            spawnedSprites.Add(spriteToSpawn);
-
-            // Create a new GameObject to hold the sprite.
-            GameObject spriteObj = new GameObject("Spawned_" + spriteToSpawn.name);
-
-            // Add a SpriteRenderer component and assign the selected sprite.
-            SpriteRenderer spriteRenderer = spriteObj.AddComponent<SpriteRenderer>();
-            spriteRenderer.sprite = spriteToSpawn;
-
-            // Place the sprite at the room's center at floor level.
-            Vector3 spawnPos = new Vector3(targetRoom.center.x, floorThickness + 0.001f, targetRoom.center.z);
-            spriteObj.transform.position = spawnPos;
-
-            // Modify the rotation so that the sprite "looks up."
-            // By default a sprite's "forward" is often determined by the camera,
-            // but you can force a rotation here if you need the sprite rotated.
-            // For example, this rotates the sprite so its top side points upward:
-            spriteObj.transform.rotation = Quaternion.LookRotation(Vector3.up);
-
-            // Alternatively, if your sprites need a fixed Euler angle adjustment, you might use:
-            // spriteObj.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+            SpawnObjectInRoom(targetRoom, tempSpritePool);
         }
+    }
+
+    /// <summary>
+    /// Spawns one object in the given room.
+    /// </summary>
+    /// <param name="room">The room where the object will be spawned.</param>
+    void SpawnObjectInRoom(Room room, List<Sprite> spritePool)
+    {
+        // Randomly select a sprite from the spawnableSprites list.
+        int randomSpriteIndex = Random.Range(0, spritePool.Count);
+        Sprite spriteToSpawn = spritePool[randomSpriteIndex];
+        spawnedSprites.Add(spriteToSpawn);
+
+        // Remove the chosen sprite from the temporary pool.
+        spritePool.RemoveAt(randomSpriteIndex);
+
+        // Create a new GameObject to display the sprite.
+        GameObject spriteObj = new GameObject("Spawned_" + spriteToSpawn.name);
+
+        // Add a SpriteRenderer component and assign the sprite.
+        SpriteRenderer spriteRenderer = spriteObj.AddComponent<SpriteRenderer>();
+        spriteRenderer.sprite = spriteToSpawn;
+
+        // Place the object at the room's center, just above the floor.
+        Vector3 spawnPos = new Vector3(room.center.x, floorThickness + 0.001f, room.center.z);
+        spriteObj.transform.position = spawnPos;
+
+        spriteObj.transform.rotation = Quaternion.LookRotation(Vector3.up);
     }
 
 

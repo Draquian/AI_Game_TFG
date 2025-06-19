@@ -1,0 +1,154 @@
+{
+    "sceneName": "Testing",
+    "playerPosX": 137.78684997558595,
+    "playerPosY": 1.6256790161132813,
+    "playerPosZ": 100.0,
+    "pStats": {
+        "instanceID": 0
+    },
+    "inventoryData": {
+        "slots": [
+            {
+                "hasItem": false,
+                "itemID": ""
+            },
+            {
+                "hasItem": false,
+                "itemID": ""
+            },
+            {
+                "hasItem": false,
+                "itemID": ""
+            },
+            {
+                "hasItem": false,
+                "itemID": ""
+            },
+            {
+                "hasItem": false,
+                "itemID": ""
+            },
+            {
+                "hasItem": false,
+                "itemID": ""
+            },
+            {
+                "hasItem": false,
+                "itemID": ""
+            },
+            {
+                "hasItem": false,
+                "itemID": ""
+            },
+            {
+                "hasItem": false,
+                "itemID": ""
+            },
+            {
+                "hasItem": false,
+                "itemID": ""
+            },
+            {
+                "hasItem": false,
+                "itemID": ""
+            },
+            {
+                "hasItem": false,
+                "itemID": ""
+            },
+            {
+                "hasItem": false,
+                "itemID": ""
+            },
+            {
+                "hasItem": false,
+                "itemID": ""
+            },
+            {
+                "hasItem": false,
+                "itemID": ""
+            },
+            {
+                "hasItem": false,
+                "itemID": ""
+            },
+            {
+                "hasItem": false,
+                "itemID": ""
+            },
+            {
+                "hasItem": false,
+                "itemID": ""
+            },
+            {
+                "hasItem": false,
+                "itemID": ""
+            },
+            {
+                "hasItem": false,
+                "itemID": ""
+            },
+            {
+                "hasItem": false,
+                "itemID": ""
+            },
+            {
+                "hasItem": false,
+                "itemID": ""
+            },
+            {
+                "hasItem": false,
+                "itemID": ""
+            },
+            {
+                "hasItem": false,
+                "itemID": ""
+            },
+            {
+                "hasItem": false,
+                "itemID": ""
+            },
+            {
+                "hasItem": false,
+                "itemID": ""
+            },
+            {
+                "hasItem": false,
+                "itemID": ""
+            },
+            {
+                "hasItem": false,
+                "itemID": ""
+            },
+            {
+                "hasItem": false,
+                "itemID": ""
+            },
+            {
+                "hasItem": false,
+                "itemID": ""
+            },
+            {
+                "hasItem": false,
+                "itemID": ""
+            },
+            {
+                "hasItem": false,
+                "itemID": ""
+            },
+            {
+                "hasItem": false,
+                "itemID": ""
+            },
+            {
+                "hasItem": false,
+                "itemID": ""
+            },
+            {
+                "hasItem": false,
+                "itemID": ""
+            }
+        ]
+    },
+    "magic": 0
+}

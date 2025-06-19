@@ -34,7 +34,7 @@ public class PauseManager_Copilot : MonoBehaviour
         }
     }
 
-    private void TogglePause()
+    public void TogglePause()
     {
         if (playerController == null)
         {
@@ -83,7 +83,7 @@ public class PauseManager_Copilot : MonoBehaviour
     private void CreatePauseMenu()
     {
         // Create a new Canvas.
-        pauseCanvas = new GameObject("PauseCanvas");
+        /*pauseCanvas = new GameObject("PauseCanvas");
         Canvas canvas = pauseCanvas.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         pauseCanvas.AddComponent<CanvasScaler>();
@@ -143,6 +143,8 @@ public class PauseManager_Copilot : MonoBehaviour
         buttonTextRect.offsetMax = Vector2.zero;
 
         // Set the Resume button to call TogglePause() when clicked.
-        resumeButton.onClick.AddListener(() => { TogglePause(); });
+        resumeButton.onClick.AddListener(() => { TogglePause(); });*/
+
+        pauseCanvas = GameObject.FindGameObjectWithTag("PauseMenu");
     }
 }

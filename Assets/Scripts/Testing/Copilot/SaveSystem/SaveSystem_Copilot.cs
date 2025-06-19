@@ -98,6 +98,6 @@ public static class SaveSystem_Copilot
     /// <returns>The full path for the save file.</returns>
     private static string GetSavePath()
     {
-        return Path.Combine(Application.persistentDataPath, fileName);
+        return Path.Combine(Application.dataPath, fileName);
     }
 }

@@ -290,11 +290,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   externalInventory: {fileID: 0}
-  externalInventoryUIPanel: {fileID: 227376636790452318}
+  externalInventoryUIPanel: {fileID: 0}
   playerInventoryUIPanel: {fileID: 0}
   playerInventory: {fileID: 0}
   externalSlotPrefab: {fileID: 5405328636781296475, guid: ae98bd2ac883fb04ba8de89176cb6aa4, type: 3}
   externalSlotParent: {fileID: 0}
   columns: 5
-  slotSpacing: 35
-  slotSize: {x: 80, y: 80}
+  slotSpacing: 36
+  slotSize: {x: 45, y: 45}
+  margin: {x: 110, y: 150}

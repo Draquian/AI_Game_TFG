@@ -26,7 +26,6 @@ public class TextMeshProTracker : MonoBehaviour
 
 	private IEnumerator ScanForNewTMPs()
 	{
-		Debug.LogError("SCANING");
 		while (true)
 		{
 			var allTMPs = Resources.FindObjectsOfTypeAll<TextMeshPro>();

@@ -106,8 +106,6 @@ public class ExternalInventory_Copilot : MonoBehaviour, IInteractable_Copilot
         {
             GameObject aux = GameObject.FindGameObjectWithTag("Player");
             playerInventory = aux.GetComponent<Inventory_Copilot>();
-            Debug.LogError(playerInventory);
-
         }
 
         playerController.lockCameraRotation = true;

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using TMPro;
 using LLMUnity;
+using System.Threading;
 
 /// <summary>
 /// Translates TextMeshPro text components on scene load and whenever their text changes or they become active.
@@ -19,6 +20,8 @@ public class TextTranslator : MonoBehaviour
 
     // Cache to avoid re-translating the same text
     private readonly Dictionary<TMP_Text, string> translatedTexts = new Dictionary<TMP_Text, string>();
+
+    private SemaphoreSlim semaphore = new SemaphoreSlim(1, 1);
 
     async void Start()
     {
@@ -78,7 +81,10 @@ public class TextTranslator : MonoBehaviour
     {
         if (obj is TMP_Text textComp && textComp.gameObject.activeInHierarchy)
         {
-            _ = TryTranslate(textComp);
+            if (!textComp.gameObject.CompareTag("Title"))
+            {
+                _ = TryTranslate(textComp);
+            }
         }
     }
 
@@ -88,32 +94,41 @@ public class TextTranslator : MonoBehaviour
     /// </summary>
     private async Task TryTranslate(TMP_Text textComp)
     {
-        // Skip objects tagged as "title"
-        if (textComp.gameObject.CompareTag("Title"))
-            return;
-
-        string currentText = textComp.text;
-        if (string.IsNullOrEmpty(currentText))
-            return;
-
-        // Skip if already translated and matches
-        if (translatedTexts.TryGetValue(textComp, out var last) && last == currentText)
-            return;
-
-        // Build prompt
-        string prompt = $"Translate the following text to {targetLanguage}: {currentText}";
+        await semaphore.WaitAsync(); // Wait your turn
         try
         {
-            string translated = await llmCharacter.Chat(prompt);
-            if (!string.IsNullOrEmpty(translated))
+            // Skip objects tagged as "title"
+            if (textComp.gameObject.CompareTag("Title"))
+                return;
+
+            string currentText = textComp.text;
+            if (string.IsNullOrEmpty(currentText))
+                return;
+
+            // Skip if already translated and matches
+            if (translatedTexts.TryGetValue(textComp, out var last) && last == currentText)
+                return;
+
+            // Build prompt
+            string prompt = $"Translate the following text to {targetLanguage}: {currentText}";
+            try
             {
-                textComp.text = translated;
-                translatedTexts[textComp] = translated;
+                string translated = await llmCharacter.Chat(prompt);
+                if (!string.IsNullOrEmpty(translated))
+                {
+                    textComp.text = translated;
+                    translatedTexts[textComp] = translated;
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Translation failed for '{currentText}': {e.Message}");
             }
         }
-        catch (Exception e)
+        finally
         {
-            Debug.LogError($"Translation failed for '{currentText}': {e.Message}");
+            semaphore.Release(); // Allow next one through
         }
+        
     }
 }

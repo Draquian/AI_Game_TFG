@@ -6,12 +6,12 @@ public class AudioManager : MonoBehaviour
     public static AudioManager Instance { get; private set; }
 
     [Header("Audio Mixer")]
-    [SerializeField] private AudioMixer masterMixer;
+    [SerializeField] public AudioMixer masterMixer;
 
     // Local cached volume values (default value is 1 which represents 100%)
-    private float masterVolume = 1f;
-    private float musicVolume = 1f;
-    private float sfxVolume = 1f;
+    public float masterVolume = 1f;
+    public float musicVolume = 1f;
+    public float sfxVolume = 1f;
 
     private void Awake()
     {
@@ -37,7 +37,7 @@ public class AudioManager : MonoBehaviour
         if (masterMixer != null)
         {
             // Convert volume to decibels
-            masterMixer.SetFloat("MasterVolume", Mathf.Log10(volume) * 20);
+            masterMixer.SetFloat("masterVolume", Mathf.Log10(volume) * 20);
         }
     }
 
@@ -46,7 +46,7 @@ public class AudioManager : MonoBehaviour
         musicVolume = volume;
         if (masterMixer != null)
         {
-            masterMixer.SetFloat("MusicVolume", Mathf.Log10(volume) * 20);
+            masterMixer.SetFloat("musicVolume", Mathf.Log10(volume) * 20);
         }
     }
 
@@ -55,7 +55,7 @@ public class AudioManager : MonoBehaviour
         sfxVolume = volume;
         if (masterMixer != null)
         {
-            masterMixer.SetFloat("SfxVolume", Mathf.Log10(volume) * 20);
+            masterMixer.SetFloat("sfxVolume", Mathf.Log10(volume) * 20);
         }
     }
 }
