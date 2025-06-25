@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 [System.Serializable]
 public class PlayerStats_Copilot : MonoBehaviour
@@ -40,8 +41,30 @@ public class PlayerStats_Copilot : MonoBehaviour
 
     public LayerMask enemyLayer;
 
+    private void OnDestroy()
+    {
+        // Unsubscribe in OnDestroy to avoid memory leaks
+        if (LoadingScreenManager_Copilot.Instance != null)
+            LoadingScreenManager_Copilot.Instance.OnSceneLoaded -= HandleSceneLoaded;
+    }
+
+    // This is your "MyHandler" — it's called when the scene is fully loaded.
+    private void HandleSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        Debug.LogError($"Scene '{scene.name}' loaded with mode {mode}!!!!!!");
+        // You can put any logic here that needs to run right after load
+    }
+
     void Awake()
     {
+        // Subscribe as early as possible
+        if (LoadingScreenManager_Copilot.Instance != null)
+        {
+            LoadingScreenManager_Copilot.Instance.OnSceneLoaded += HandleSceneLoaded;
+        }
+        else
+            Debug.LogError("No LoadingScreenManager_Copilot.Instance found in Awake!");
+
         // Randomly assign a magic type for this game session.
         magicType = (MagicType)Random.Range(0, System.Enum.GetValues(typeof(MagicType)).Length);
         Debug.Log("Assigned Magic Type: " + magicType);

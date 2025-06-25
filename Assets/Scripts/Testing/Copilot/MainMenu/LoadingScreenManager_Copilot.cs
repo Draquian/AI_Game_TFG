@@ -1,7 +1,7 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
+using System;
 using System.Collections;
-using UnityEngine.UI;
 
 public class LoadingScreenManager_Copilot : MonoBehaviour
 {
@@ -13,6 +13,12 @@ public class LoadingScreenManager_Copilot : MonoBehaviour
 
     // (Optional) Add UI elements such as a progress bar:
     // public Slider progressBar;
+
+    // In LoadingScreenManager_Copilot.cs
+    /// <summary>
+    /// Fired whenever a new scene has finished loading.
+    /// </summary>
+    public event Action<Scene, LoadSceneMode> OnSceneLoaded;
 
     private void Awake()
     {
@@ -41,39 +47,55 @@ public class LoadingScreenManager_Copilot : MonoBehaviour
         StartCoroutine(LoadSceneAsync(sceneName));
     }
 
-    IEnumerator LoadSceneAsync(string sceneName)
+    private IEnumerator LoadSceneAsync(string sceneName)
     {
-        float minLoadingTime = 5f;
+        const float minDisplayTime = 5f;
         float startTime = Time.time;
 
-        // Begin asynchronous scene loading.
-        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName);
-        asyncLoad.allowSceneActivation = false;
+        // Kick off the async load but don’t allow activation yet.
+        AsyncOperation op = SceneManager.LoadSceneAsync(sceneName);
+        op.allowSceneActivation = false;
 
-        //Image imageColor = loadingprogresion.GetComponent<Image>();
-        while (!asyncLoad.isDone)
+        // — Phase 1: Load up to 90% (Unity’s convention for “loaded but not activated”)
+        while (op.progress < 0.9f)
         {
-            // (Optional) Update progress UI if needed.
-            //imageColor.color = new Color(1,1,1, asyncLoad.progress);
+            // Update your progress‐bar alpha
+            /*float normalized = Mathf.Clamp01(op.progress / 0.9f);
+            if (loadingProgressImage != null)
+                loadingProgressImage.color = new Color(1, 1, 1, normalized);*/
 
-            if (asyncLoad.progress >= 0.9f)
-            {
-                // Calculate elapsed time
-                float elapsed = Time.time - startTime;
-                if (elapsed < minLoadingTime)
-                {
-                    // Wait the remaining time so the loading screen shows for at least 5 seconds.
-                    yield return new WaitForSeconds(minLoadingTime - elapsed);
-                }
-                // Allow the scene to activate.
-                asyncLoad.allowSceneActivation = true;
-            }
             yield return null;
         }
 
-        if (loadingScreen != null)
+        // Enforce a minimum display time
+        float elapsed = Time.time - startTime;
+        if (elapsed < minDisplayTime)
         {
-            loadingScreen.SetActive(false);
+            yield return new WaitForSeconds(minDisplayTime - elapsed);
         }
+
+        // — Phase 2: Now allow the scene to activate
+        op.allowSceneActivation = true;
+
+        // Wait until the operation is fully done (scene has swapped in)
+        yield return new WaitUntil(() => op.isDone);
+
+        // Hide the loading screen
+        if (loadingScreen != null)
+            loadingScreen.SetActive(false);
+
+        // Fire your callback/event now that the scene is truly loaded
+        OnSceneLoaded?.Invoke(SceneManager.GetActiveScene(), LoadSceneMode.Single);
+    }
+
+    // This method is called by Unity whenever a scene is loaded.
+    private void SceneLoadedCallback(Scene scene, LoadSceneMode mode)
+    {
+        // Hide the loading screen in case it's still active
+        if (loadingScreen != null)
+            loadingScreen.SetActive(false);
+
+        // Fire our own event so other scripts can react
+        OnSceneLoaded?.Invoke(scene, mode);
     }
 }

@@ -68,16 +68,37 @@ public class MainMenu_Copilot : MonoBehaviour
         resolutionDropdown.value = currentResolutionIndex;
         resolutionDropdown.RefreshShownValue();
 
-        // Optionally initialize the UI elements with current game state values
-        fullscreenToggle.isOn = Screen.fullScreen;
-        masterSlider.value = AudioManager.Instance != null ? AudioManager.Instance.GetMasterVolume() : 1f;
-        musicSlider.value = AudioManager.Instance != null ? AudioManager.Instance.GetMusicVolume() : 1f;
-        sfxSlider.value = AudioManager.Instance != null ? AudioManager.Instance.GetSfxVolume() : 1f;
-        uiScaleSlider.value = UIManager.Instance != null ? UIManager.Instance.GetScale() : 1f;
-        masterValue.text = AudioManager.Instance != null ? AudioManager.Instance.masterVolume.ToString() : "100";
-        musicValue.text = AudioManager.Instance != null ? AudioManager.Instance.musicVolume.ToString() : "100";
-        sfxValue.text = AudioManager.Instance != null ? AudioManager.Instance.sfxVolume.ToString() : "100";
-        mouseSensitivitySlider.value = pControl != null ? pControl.GetCameraSensitivity() : 1f;
+
+
+        // Check if a save file exists
+        if (SaveSystem_Copilot.SaveFileExists())
+        {
+            // Load saved game data (this can include the last scene name, player stats, etc.)
+            SaveData_Copilot data = SaveSystem_Copilot.Load();
+
+            fullscreenToggle.isOn = data.fullScreen;
+            masterSlider.value = data.masterVolume;
+            musicSlider.value = data.musicVolume;
+            sfxSlider.value = data.SFXVolume;
+            uiScaleSlider.value = data.UIScale;
+            mouseSensitivitySlider.value = data.sensivility;
+            masterValue.text = data.masterVolume.ToString("0.01");
+            musicValue.text = data.musicVolume.ToString("0.01");
+            sfxValue.text = data.SFXVolume.ToString("0.01");
+        }
+        else
+        {
+            // Optionally initialize the UI elements with current game state values
+            fullscreenToggle.isOn = Screen.fullScreen;
+            masterSlider.value = AudioManager.Instance != null ? AudioManager.Instance.GetMasterVolume() : 1f;
+            musicSlider.value = AudioManager.Instance != null ? AudioManager.Instance.GetMusicVolume() : 1f;
+            sfxSlider.value = AudioManager.Instance != null ? AudioManager.Instance.GetSfxVolume() : 1f;
+            uiScaleSlider.value = UIManager.Instance != null ? UIManager.Instance.GetScale() : 1f;
+            masterValue.text = AudioManager.Instance != null ? AudioManager.Instance.masterVolume.ToString() : "100";
+            musicValue.text = AudioManager.Instance != null ? AudioManager.Instance.musicVolume.ToString() : "100";
+            sfxValue.text = AudioManager.Instance != null ? AudioManager.Instance.sfxVolume.ToString() : "100";
+            mouseSensitivitySlider.value = pControl != null ? pControl.GetCameraSensitivity() : 1f;
+        }
     }
 
     // Called when "New Game" is triggered
@@ -100,7 +121,6 @@ public class MainMenu_Copilot : MonoBehaviour
         SaveManager.Instance.SaveGame(pControl.transform);
         SaveManager.Instance.SaveGame(pInventory);
         SaveManager.Instance.SaveGame(pStats.magicType);
-        Debug.LogError(pStats.magicType);
 
         // Load the new game scene
         //LoadingScreenManager_Copilot.Instance.LoadSceneWithLoadingScreen("MainMenu");
@@ -205,5 +225,13 @@ public class MainMenu_Copilot : MonoBehaviour
     public void SetMouseSensitivity(float sensitivity)
     {
             pControl.SetCameraSensitivity(sensitivity);
+    }
+
+    public void SaveSettings()
+    {
+        SaveManager.Instance.SaveSettings(AudioManager.Instance.masterVolume, AudioManager.Instance.sfxVolume, AudioManager.Instance.musicVolume);
+        SaveManager.Instance.SaveSettings(uiScaleSlider.value, mouseSensitivitySlider.value);
+        //SaveManager.Instance.SaveSettings(lenguage);
+        SaveManager.Instance.SaveSettings(fullscreenToggle);
     }
 }

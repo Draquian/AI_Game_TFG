@@ -16,5 +16,15 @@ public class SaveData_Copilot
     // Add a field to store the inventory data.
     public InventoryData_Copilot inventoryData;
 
-    public MagicType magic;
+    public string magic;
+
+    //Settigns
+    public string lenguage = "Català";
+    public float UIScale = 1;
+    public float sensivility = 1;
+    public float masterVolume = 1;
+    public float SFXVolume = 1;
+    public float musicVolume = 1;
+    public bool fullScreen = true;
+
 }

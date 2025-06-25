@@ -82,7 +82,34 @@ public class SaveManager
 
     public void SaveGame(MagicType magic)
     {
-        currentData.magic = magic;
+        currentData.magic = magic.ToString();
+    }
+
+    public void SaveSettings(float master, float sfx, float music)
+    {
+        currentData.masterVolume = master;
+        currentData.SFXVolume = sfx;
+        currentData.musicVolume = music;
+        SaveSystem_Copilot.Save(currentData);
+    }
+
+    public void SaveSettings(float ui, float sensivility)
+    {
+        currentData.UIScale = ui;
+        currentData.sensivility = sensivility;
+        SaveSystem_Copilot.Save(currentData);
+    }
+
+    public void SaveSettings(string lenguage)
+    {
+        currentData.lenguage = lenguage;
+        SaveSystem_Copilot.Save(currentData);
+    }
+
+    public void SaveSettings(bool fullScreen)
+    {
+        currentData.fullScreen = fullScreen;
+        SaveSystem_Copilot.Save(currentData);
     }
 
     /// <summary>
